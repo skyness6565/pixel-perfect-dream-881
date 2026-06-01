@@ -96,6 +96,21 @@ function AdminPage() {
     setBusyId(null);
   }
 
+  async function updateAppointment(id: string, status: string) {
+    setBusyId(id);
+    const { error } = await supabase
+      .from("appointments")
+      .update({ status })
+      .eq("id", id);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success(`Appointment marked ${status}`);
+      setAppointments((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
+    }
+    setBusyId(null);
+  }
+
   if (loading || !session) {
     return (
       <div className="min-h-screen bg-background">
@@ -234,6 +249,25 @@ function AdminPage() {
                   </div>
                   {a.notes && <p className="mt-2 text-sm text-muted-foreground"><span className="text-foreground">Notes:</span> {a.notes}</p>}
                   <p className="mt-2 text-xs text-muted-foreground">Account: {profiles[a.user_id]?.email ?? a.user_id.slice(0, 8)}</p>
+
+                  <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-4">
+                    <span className="font-heading text-xs font-semibold uppercase tracking-wide text-muted-foreground">Set status:</span>
+                    {(["pending", "approved", "completed", "cancelled"] as const).map((s) => (
+                      <button
+                        key={s}
+                        disabled={busyId === a.id || a.status === s}
+                        onClick={() => updateAppointment(a.id, s)}
+                        className={`inline-flex items-center gap-1.5 border px-3 py-1.5 text-xs font-semibold capitalize transition-colors disabled:cursor-not-allowed ${
+                          a.status === s
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border text-foreground hover:bg-background"
+                        }`}
+                      >
+                        {busyId === a.id && a.status !== s ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                        {s}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>

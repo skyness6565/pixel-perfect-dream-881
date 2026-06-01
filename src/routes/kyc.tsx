@@ -17,11 +17,47 @@ function KycPage() {
   const { session, loading, kycStatus, user, refresh } = useAuth();
   const [front, setFront] = useState<File | null>(null);
   const [back, setBack] = useState<File | null>(null);
+  const [frontPreview, setFrontPreview] = useState<string | null>(null);
+  const [backPreview, setBackPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (!loading && !session) router.navigate({ to: "/auth" });
   }, [loading, session, router]);
+
+  // Build & clean up object-URL previews
+  useEffect(() => {
+    if (!front) {
+      setFrontPreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(front);
+    setFrontPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [front]);
+
+  useEffect(() => {
+    if (!back) {
+      setBackPreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(back);
+    setBackPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [back]);
+
+  function pickFile(setter: (f: File | null) => void, file: File | null) {
+    if (file && !file.type.startsWith("image/")) {
+      toast.error("Please choose an image file (JPG or PNG).");
+      return;
+    }
+    if (file && file.size > 10 * 1024 * 1024) {
+      toast.error("Image is too large. Maximum size is 10MB.");
+      return;
+    }
+    setter(file);
+  }
+
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -121,8 +157,8 @@ function KycPage() {
           {showForm && (
             <form onSubmit={handleSubmit} className="mt-8 space-y-6">
               {[
-                { label: "ID Front", file: front, set: setFront, id: "front" },
-                { label: "ID Back", file: back, set: setBack, id: "back" },
+                { label: "ID Front", file: front, set: setFront, preview: frontPreview, id: "front" },
+                { label: "ID Back", file: back, set: setBack, preview: backPreview, id: "back" },
               ].map((f) => (
                 <div key={f.id}>
                   <label className="block font-heading text-sm font-semibold text-foreground">{f.label} *</label>
@@ -130,12 +166,36 @@ function KycPage() {
                     <Upload className="h-5 w-5" />
                     <span className="text-sm">{f.file ? f.file.name : `Choose ${f.label.toLowerCase()} image`}</span>
                   </label>
-                  <input id={f.id} type="file" accept="image/*" className="hidden" onChange={(e) => f.set(e.target.files?.[0] ?? null)} />
+                  <input
+                    id={f.id}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => pickFile(f.set, e.target.files?.[0] ?? null)}
+                  />
+                  {f.preview && (
+                    <div className="mt-3">
+                      <div className="relative overflow-hidden rounded border border-border bg-secondary">
+                        <img
+                          src={f.preview}
+                          alt={`${f.label} preview`}
+                          className="max-h-56 w-full object-contain"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => f.set(null)}
+                        className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-red-600 hover:underline"
+                      >
+                        <XCircle className="h-4 w-4" /> Remove
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
 
               <button type="submit" disabled={busy} className="inline-flex w-full items-center justify-center gap-2 bg-foreground px-8 py-3 font-heading text-sm font-semibold uppercase tracking-widest text-background transition-colors hover:bg-primary disabled:opacity-60">
-                {busy && <Loader2 className="h-4 w-4 animate-spin" />} Submit for verification
+                {busy && <Loader2 className="h-4 w-4 animate-spin" />} {kycStatus === "rejected" ? "Resubmit for verification" : "Submit for verification"}
               </button>
             </form>
           )}
