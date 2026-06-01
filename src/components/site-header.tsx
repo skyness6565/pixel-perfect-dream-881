@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
-const NAV_ITEMS = [
-  "Home",
-  "About George",
-  "News",
-  "Store",
-  "Fan Club",
-  "Shows",
-  "The Music",
-  "Galleries",
+const NAV_ITEMS: { label: string; to: string }[] = [
+  { label: "Home", to: "/" },
+  { label: "About George", to: "/about-george" },
+  { label: "News", to: "/" },
+  { label: "Store", to: "/" },
+  { label: "Fan Club", to: "/" },
+  { label: "Shows", to: "/" },
+  { label: "The Music", to: "/" },
+  { label: "Galleries", to: "/" },
 ];
 
 export function SiteHeader() {
@@ -18,27 +19,24 @@ export function SiteHeader() {
   return (
     <header className="absolute inset-x-0 top-0 z-50 bg-background/70 backdrop-blur-sm">
       <div className="mx-auto flex h-20 max-w-[1600px] items-center justify-between px-5 lg:px-10">
-        <a
-          href="#home"
+        <Link
+          to="/"
           className="font-display text-2xl tracking-tight text-foreground lg:text-3xl"
         >
           GEORGE STRAIT
-        </a>
+        </Link>
 
         <nav className="hidden items-center gap-7 lg:flex">
-          {NAV_ITEMS.map((item, i) => (
-            <a
-              key={item}
-              href="#home"
-              className={`relative font-heading text-sm font-medium uppercase tracking-wide transition-colors hover:text-primary ${
-                i === 0 ? "text-foreground" : "text-foreground/85"
-              }`}
+          {NAV_ITEMS.map((item) => (
+            <Link
+              key={item.label}
+              to={item.to}
+              className="relative font-heading text-sm font-medium uppercase tracking-wide text-foreground/85 transition-colors hover:text-primary"
+              activeProps={{ className: "text-foreground" }}
+              activeOptions={{ exact: true }}
             >
-              {item}
-              {i === 0 && (
-                <span className="absolute -top-[26px] left-1/2 h-1 w-8 -translate-x-1/2 bg-primary" />
-              )}
-            </a>
+              {item.label}
+            </Link>
           ))}
         </nav>
 
@@ -54,14 +52,14 @@ export function SiteHeader() {
       {open && (
         <nav className="border-t border-border bg-background px-5 pb-4 lg:hidden">
           {NAV_ITEMS.map((item) => (
-            <a
-              key={item}
-              href="#home"
+            <Link
+              key={item.label}
+              to={item.to}
               className="block py-3 font-heading text-sm font-medium uppercase tracking-wide text-foreground/85 hover:text-primary"
               onClick={() => setOpen(false)}
             >
-              {item}
-            </a>
+              {item.label}
+            </Link>
           ))}
         </nav>
       )}
