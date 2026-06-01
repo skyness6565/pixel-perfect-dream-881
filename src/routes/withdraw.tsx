@@ -108,6 +108,12 @@ function WithdrawPage() {
     );
   }
 
+  if (blocked) {
+    return <BlockedNotice />;
+  }
+
+
+
   // Block withdrawals until KYC is approved
   if (kycStatus !== "approved") {
     const pending = kycStatus === "pending";
