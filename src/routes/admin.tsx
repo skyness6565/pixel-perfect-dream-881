@@ -116,6 +116,48 @@ function AdminPage() {
     setBusyId(null);
   }
 
+  async function fundUser(u: Profile) {
+    const input = window.prompt(
+      `Add funds to ${u.full_name || u.email || "user"} (current balance $${Number(u.balance).toFixed(2)}).\nEnter amount to add (use a negative number to deduct):`,
+      "100",
+    );
+    if (input === null) return;
+    const amount = Number(input);
+    if (!Number.isFinite(amount) || amount === 0) {
+      toast.error("Enter a valid non-zero amount");
+      return;
+    }
+    const newBalance = Math.max(0, Number(u.balance) + amount);
+    setBusyId(u.id);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ balance: newBalance })
+      .eq("id", u.id);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success(`Balance updated to $${newBalance.toFixed(2)}`);
+      setUsers((prev) => prev.map((p) => (p.id === u.id ? { ...p, balance: newBalance } : p)));
+    }
+    setBusyId(null);
+  }
+
+  async function toggleBlock(u: Profile) {
+    const next = !u.blocked;
+    setBusyId(u.id);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ blocked: next })
+      .eq("id", u.id);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success(next ? "Account blocked" : "Account unblocked");
+      setUsers((prev) => prev.map((p) => (p.id === u.id ? { ...p, blocked: next } : p)));
+    }
+    setBusyId(null);
+  }
+
   if (loading || !session) {
     return (
       <div className="min-h-screen bg-background">
