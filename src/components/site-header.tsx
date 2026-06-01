@@ -7,7 +7,7 @@ const NAV_ITEMS: { label: string; to: string }[] = [
   { label: "About George", to: "/about-george" },
   { label: "News", to: "/news" },
   { label: "Store", to: "/store" },
-  { label: "Fan Club", to: "/" },
+  { label: "Fan Club", to: "/fan-club" },
   { label: "Shows", to: "/" },
   { label: "The Music", to: "/" },
   { label: "Galleries", to: "/" },
