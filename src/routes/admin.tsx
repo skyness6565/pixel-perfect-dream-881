@@ -277,7 +277,7 @@ function AdminPage() {
                 </div>
               ))}
             </div>
-          ) : (
+          ) : tab === "appointments" ? (
             <div className="mt-8 space-y-4">
               {appointments.length === 0 && <p className="text-muted-foreground">No appointments yet.</p>}
               {appointments.map((a) => (
