@@ -82,7 +82,7 @@ const AVAILABLE_BALANCE = 1250.0;
 
 function WithdrawPage() {
   const router = useRouter();
-  const { session, loading, kycStatus } = useAuth();
+  const { session, loading, kycStatus, blocked } = useAuth();
   const [submitted, setSubmitted] = useState(false);
   const [amount, setAmount] = useState("");
 
