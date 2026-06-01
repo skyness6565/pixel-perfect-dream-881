@@ -13,6 +13,8 @@ type AuthContextValue = {
   user: User | null;
   loading: boolean;
   isAdmin: boolean;
+  blocked: boolean;
+  balance: number;
   kycStatus: "none" | "pending" | "approved" | "rejected";
   refresh: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -24,6 +26,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [blocked, setBlocked] = useState(false);
+  const [balance, setBalance] = useState(0);
   const [kycStatus, setKycStatus] =
     useState<AuthContextValue["kycStatus"]>("none");
 
@@ -31,9 +35,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!uid) {
       setIsAdmin(false);
       setKycStatus("none");
+      setBlocked(false);
+      setBalance(0);
       return;
     }
-    const [{ data: roles }, { data: kyc }] = await Promise.all([
+    const [{ data: roles }, { data: kyc }, { data: profile }] = await Promise.all([
       supabase.from("user_roles").select("role").eq("user_id", uid),
       supabase
         .from("kyc_submissions")
@@ -41,8 +47,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq("user_id", uid)
         .order("created_at", { ascending: false })
         .limit(1),
+      supabase
+        .from("profiles")
+        .select("balance, blocked")
+        .eq("id", uid)
+        .maybeSingle(),
     ]);
     setIsAdmin(!!roles?.some((r) => r.role === "admin"));
+    setBlocked(!!profile?.blocked);
+    setBalance(Number(profile?.balance ?? 0));
     if (kyc && kyc.length > 0) {
       setKycStatus(kyc[0].status as AuthContextValue["kycStatus"]);
     } else {
