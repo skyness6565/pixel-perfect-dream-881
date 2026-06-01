@@ -15,6 +15,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as NewsRouteImport } from './routes/news'
 import { Route as KycRouteImport } from './routes/kyc'
 import { Route as FanClubRouteImport } from './routes/fan-club'
+import { Route as BookAppointmentRouteImport } from './routes/book-appointment'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutGeorgeRouteImport } from './routes/about-george'
@@ -50,6 +51,11 @@ const FanClubRoute = FanClubRouteImport.update({
   path: '/fan-club',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BookAppointmentRoute = BookAppointmentRouteImport.update({
+  id: '/book-appointment',
+  path: '/book-appointment',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/about-george': typeof AboutGeorgeRoute
   '/account': typeof AccountRoute
   '/auth': typeof AuthRoute
+  '/book-appointment': typeof BookAppointmentRoute
   '/fan-club': typeof FanClubRoute
   '/kyc': typeof KycRoute
   '/news': typeof NewsRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/about-george': typeof AboutGeorgeRoute
   '/account': typeof AccountRoute
   '/auth': typeof AuthRoute
+  '/book-appointment': typeof BookAppointmentRoute
   '/fan-club': typeof FanClubRoute
   '/kyc': typeof KycRoute
   '/news': typeof NewsRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/about-george': typeof AboutGeorgeRoute
   '/account': typeof AccountRoute
   '/auth': typeof AuthRoute
+  '/book-appointment': typeof BookAppointmentRoute
   '/fan-club': typeof FanClubRoute
   '/kyc': typeof KycRoute
   '/news': typeof NewsRoute
@@ -115,6 +124,7 @@ export interface FileRouteTypes {
     | '/about-george'
     | '/account'
     | '/auth'
+    | '/book-appointment'
     | '/fan-club'
     | '/kyc'
     | '/news'
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/about-george'
     | '/account'
     | '/auth'
+    | '/book-appointment'
     | '/fan-club'
     | '/kyc'
     | '/news'
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/about-george'
     | '/account'
     | '/auth'
+    | '/book-appointment'
     | '/fan-club'
     | '/kyc'
     | '/news'
@@ -152,6 +164,7 @@ export interface RootRouteChildren {
   AboutGeorgeRoute: typeof AboutGeorgeRoute
   AccountRoute: typeof AccountRoute
   AuthRoute: typeof AuthRoute
+  BookAppointmentRoute: typeof BookAppointmentRoute
   FanClubRoute: typeof FanClubRoute
   KycRoute: typeof KycRoute
   NewsRoute: typeof NewsRoute
@@ -204,6 +217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FanClubRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/book-appointment': {
+      id: '/book-appointment'
+      path: '/book-appointment'
+      fullPath: '/book-appointment'
+      preLoaderRoute: typeof BookAppointmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -240,6 +260,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutGeorgeRoute: AboutGeorgeRoute,
   AccountRoute: AccountRoute,
   AuthRoute: AuthRoute,
+  BookAppointmentRoute: BookAppointmentRoute,
   FanClubRoute: FanClubRoute,
   KycRoute: KycRoute,
   NewsRoute: NewsRoute,
@@ -250,3 +271,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
