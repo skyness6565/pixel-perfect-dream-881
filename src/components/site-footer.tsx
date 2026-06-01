@@ -6,7 +6,7 @@ const COL_ONE: { label: string; to: string }[] = [
   { label: "About George", to: "/about-george" },
   { label: "News", to: "/news" },
   { label: "Store", to: "/store" },
-  { label: "Fan Club", to: "/" },
+  { label: "Fan Club", to: "/fan-club" },
 ];
 const COL_TWO: { label: string; to: string }[] = [
   { label: "Shows", to: "/" },
