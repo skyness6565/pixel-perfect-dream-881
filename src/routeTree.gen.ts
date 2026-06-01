@@ -17,6 +17,7 @@ import { Route as KycRouteImport } from './routes/kyc'
 import { Route as FanClubRouteImport } from './routes/fan-club'
 import { Route as BookAppointmentRouteImport } from './routes/book-appointment'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutGeorgeRouteImport } from './routes/about-george'
 import { Route as IndexRouteImport } from './routes/index'
@@ -61,6 +62,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AccountRoute = AccountRouteImport.update({
   id: '/account',
   path: '/account',
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about-george': typeof AboutGeorgeRoute
   '/account': typeof AccountRoute
+  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/book-appointment': typeof BookAppointmentRoute
   '/fan-club': typeof FanClubRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about-george': typeof AboutGeorgeRoute
   '/account': typeof AccountRoute
+  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/book-appointment': typeof BookAppointmentRoute
   '/fan-club': typeof FanClubRoute
@@ -108,6 +116,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about-george': typeof AboutGeorgeRoute
   '/account': typeof AccountRoute
+  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/book-appointment': typeof BookAppointmentRoute
   '/fan-club': typeof FanClubRoute
@@ -123,6 +132,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about-george'
     | '/account'
+    | '/admin'
     | '/auth'
     | '/book-appointment'
     | '/fan-club'
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about-george'
     | '/account'
+    | '/admin'
     | '/auth'
     | '/book-appointment'
     | '/fan-club'
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about-george'
     | '/account'
+    | '/admin'
     | '/auth'
     | '/book-appointment'
     | '/fan-club'
@@ -163,6 +175,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutGeorgeRoute: typeof AboutGeorgeRoute
   AccountRoute: typeof AccountRoute
+  AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   BookAppointmentRoute: typeof BookAppointmentRoute
   FanClubRoute: typeof FanClubRoute
@@ -231,6 +244,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/account': {
       id: '/account'
       path: '/account'
@@ -259,6 +279,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutGeorgeRoute: AboutGeorgeRoute,
   AccountRoute: AccountRoute,
+  AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   BookAppointmentRoute: BookAppointmentRoute,
   FanClubRoute: FanClubRoute,
