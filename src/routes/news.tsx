@@ -203,7 +203,6 @@ function NewsPage() {
                     <img
                       src={article.image}
                       alt={article.title}
-                      loading="lazy"
                       className="aspect-[1140/550] w-full object-cover object-center"
                     />
                   </div>
@@ -301,7 +300,6 @@ function NewsPage() {
                 <img
                   src={ALBUM_COVER}
                   alt="George Strait — Cowboys and Dreamers"
-                  loading="lazy"
                   className="aspect-square w-full object-cover"
                 />
               </div>
