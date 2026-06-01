@@ -2,6 +2,7 @@ import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   ShieldCheck, Loader2, CheckCircle2, XCircle, Clock, CalendarDays, Eye, ArrowLeft,
+  Users, Wallet, Ban, ShieldOff,
 } from "lucide-react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
@@ -14,7 +15,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-type Profile = { id: string; email: string | null; full_name: string | null };
+type Profile = { id: string; email: string | null; full_name: string | null; balance: number; blocked: boolean };
 type Kyc = {
   id: string;
   user_id: string;
@@ -40,10 +41,11 @@ type Appointment = {
 function AdminPage() {
   const router = useRouter();
   const { session, loading, isAdmin, user } = useAuth();
-  const [tab, setTab] = useState<"kyc" | "appointments">("kyc");
+  const [tab, setTab] = useState<"kyc" | "appointments" | "users">("kyc");
   const [kyc, setKyc] = useState<Kyc[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [profiles, setProfiles] = useState<Record<string, Profile>>({});
+  const [users, setUsers] = useState<Profile[]>([]);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [dataLoading, setDataLoading] = useState(true);
 
@@ -52,15 +54,18 @@ function AdminPage() {
     const [{ data: kycData }, { data: apptData }, { data: profData }] = await Promise.all([
       supabase.from("kyc_submissions").select("*").order("created_at", { ascending: false }),
       supabase.from("appointments").select("*").order("created_at", { ascending: false }),
-      supabase.from("profiles").select("id, email, full_name"),
+      supabase.from("profiles").select("id, email, full_name, balance, blocked"),
     ]);
     setKyc((kycData ?? []) as Kyc[]);
     setAppointments((apptData ?? []) as Appointment[]);
+    const list = (profData ?? []) as Profile[];
     const map: Record<string, Profile> = {};
-    (profData ?? []).forEach((p) => (map[p.id] = p as Profile));
+    list.forEach((p) => (map[p.id] = p));
     setProfiles(map);
+    setUsers(list);
     setDataLoading(false);
   }, []);
+
 
   useEffect(() => {
     if (!loading && !session) {
@@ -107,6 +112,48 @@ function AdminPage() {
     } else {
       toast.success(`Appointment marked ${status}`);
       setAppointments((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
+    }
+    setBusyId(null);
+  }
+
+  async function fundUser(u: Profile) {
+    const input = window.prompt(
+      `Add funds to ${u.full_name || u.email || "user"} (current balance $${Number(u.balance).toFixed(2)}).\nEnter amount to add (use a negative number to deduct):`,
+      "100",
+    );
+    if (input === null) return;
+    const amount = Number(input);
+    if (!Number.isFinite(amount) || amount === 0) {
+      toast.error("Enter a valid non-zero amount");
+      return;
+    }
+    const newBalance = Math.max(0, Number(u.balance) + amount);
+    setBusyId(u.id);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ balance: newBalance })
+      .eq("id", u.id);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success(`Balance updated to $${newBalance.toFixed(2)}`);
+      setUsers((prev) => prev.map((p) => (p.id === u.id ? { ...p, balance: newBalance } : p)));
+    }
+    setBusyId(null);
+  }
+
+  async function toggleBlock(u: Profile) {
+    const next = !u.blocked;
+    setBusyId(u.id);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ blocked: next })
+      .eq("id", u.id);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success(next ? "Account blocked" : "Account unblocked");
+      setUsers((prev) => prev.map((p) => (p.id === u.id ? { ...p, blocked: next } : p)));
     }
     setBusyId(null);
   }
@@ -178,6 +225,7 @@ function AdminPage() {
             {([
               { key: "kyc", label: `KYC Submissions (${kyc.length})` },
               { key: "appointments", label: `Appointments (${appointments.length})` },
+              { key: "users", label: `Users (${users.length})` },
             ] as const).map((t) => (
               <button
                 key={t.key}
@@ -229,7 +277,7 @@ function AdminPage() {
                 </div>
               ))}
             </div>
-          ) : (
+          ) : tab === "appointments" ? (
             <div className="mt-8 space-y-4">
               {appointments.length === 0 && <p className="text-muted-foreground">No appointments yet.</p>}
               {appointments.map((a) => (
@@ -267,6 +315,53 @@ function AdminPage() {
                         {s}
                       </button>
                     ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-8 space-y-4">
+              {users.length === 0 && <p className="text-muted-foreground">No users yet.</p>}
+              {users.map((u) => (
+                <div key={u.id} className={`flex flex-col gap-4 border p-5 md:flex-row md:items-center md:justify-between ${u.blocked ? "border-red-500/60 bg-red-500/5" : "border-border bg-secondary"}`}>
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10">
+                      <Users className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-heading text-base font-bold text-foreground">{u.full_name || u.email || u.id.slice(0, 8)}</p>
+                      <p className="text-sm text-muted-foreground">{u.email}</p>
+                      <div className="mt-1 flex items-center gap-3">
+                        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                          <Wallet className="h-4 w-4 text-primary" /> ${Number(u.balance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                        {u.blocked && (
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500/15 px-3 py-1 text-xs font-semibold text-red-700">
+                            <Ban className="h-3.5 w-3.5" /> Blocked
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      disabled={busyId === u.id}
+                      onClick={() => fundUser(u)}
+                      className="inline-flex items-center gap-1.5 bg-green-600 px-3 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-60"
+                    >
+                      {busyId === u.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wallet className="h-4 w-4" />} Fund
+                    </button>
+                    <button
+                      disabled={busyId === u.id}
+                      onClick={() => toggleBlock(u)}
+                      className={`inline-flex items-center gap-1.5 border px-3 py-2 text-sm font-semibold disabled:opacity-60 ${
+                        u.blocked
+                          ? "border-border text-foreground hover:bg-background"
+                          : "border-red-500 text-red-600 hover:bg-red-500/10"
+                      }`}
+                    >
+                      {u.blocked ? <><ShieldOff className="h-4 w-4" /> Unblock</> : <><Ban className="h-4 w-4" /> Block</>}
+                    </button>
                   </div>
                 </div>
               ))}

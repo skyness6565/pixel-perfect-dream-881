@@ -1,8 +1,9 @@
 import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { CalendarDays, ShieldCheck, Banknote, LogOut, Clock, XCircle, CheckCircle2, CheckCheck } from "lucide-react";
+import { CalendarDays, ShieldCheck, Banknote, LogOut, Clock, XCircle, CheckCircle2, CheckCheck, Wallet } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { BlockedNotice } from "@/components/blocked-notice";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 
@@ -29,7 +30,7 @@ const APPT_STATUS: Record<string, { label: string; cls: string; Icon: typeof Clo
 
 function AccountPage() {
   const router = useRouter();
-  const { session, loading, kycStatus, user, signOut } = useAuth();
+  const { session, loading, kycStatus, blocked, balance, user, signOut } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [apptLoading, setApptLoading] = useState(true);
 
@@ -66,6 +67,10 @@ function AccountPage() {
         <SiteFooter />
       </div>
     );
+  }
+
+  if (blocked) {
+    return <BlockedNotice />;
   }
 
   const kycBadge = {
@@ -112,6 +117,20 @@ function AccountPage() {
             <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold ${kycBadge.cls}`}>
               <kycBadge.Icon className="h-4 w-4" /> {kycBadge.label}
             </span>
+          </div>
+
+          <div className="mt-8 flex items-center gap-4 border border-border bg-secondary p-6">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+              <Wallet className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <p className="font-heading text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Account Balance
+              </p>
+              <p className="font-display text-3xl text-foreground">
+                ${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+            </div>
           </div>
 
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

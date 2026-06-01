@@ -3,6 +3,7 @@ import { useState, useEffect, type FormEvent } from "react";
 import { CheckCircle2, ExternalLink, Banknote, ShieldCheck, ShieldAlert, Clock } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { BlockedNotice } from "@/components/blocked-notice";
 import { useAuth } from "@/lib/auth";
 
 const MEDIA = "https://georgestrait.com/media";
@@ -82,7 +83,7 @@ const AVAILABLE_BALANCE = 1250.0;
 
 function WithdrawPage() {
   const router = useRouter();
-  const { session, loading, kycStatus } = useAuth();
+  const { session, loading, kycStatus, blocked } = useAuth();
   const [submitted, setSubmitted] = useState(false);
   const [amount, setAmount] = useState("");
 
@@ -107,6 +108,12 @@ function WithdrawPage() {
       </div>
     );
   }
+
+  if (blocked) {
+    return <BlockedNotice />;
+  }
+
+
 
   // Block withdrawals until KYC is approved
   if (kycStatus !== "approved") {
