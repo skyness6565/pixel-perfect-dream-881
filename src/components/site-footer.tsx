@@ -1,7 +1,19 @@
 import { Facebook, Twitter, Instagram, Youtube, Music2 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
-const COL_ONE = ["Home", "About George", "News", "Store", "Fan Club"];
-const COL_TWO = ["Shows", "Strait Talk", "The Music", "Galleries"];
+const COL_ONE: { label: string; to: string }[] = [
+  { label: "Home", to: "/" },
+  { label: "About George", to: "/about-george" },
+  { label: "News", to: "/" },
+  { label: "Store", to: "/" },
+  { label: "Fan Club", to: "/" },
+];
+const COL_TWO: { label: string; to: string }[] = [
+  { label: "Shows", to: "/" },
+  { label: "Strait Talk", to: "/" },
+  { label: "The Music", to: "/" },
+  { label: "Galleries", to: "/" },
+];
 
 const SOCIALS = [
   { Icon: Facebook, label: "Facebook", bg: "bg-[#3b5998]" },
