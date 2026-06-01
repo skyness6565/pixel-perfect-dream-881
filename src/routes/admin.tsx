@@ -41,10 +41,11 @@ type Appointment = {
 function AdminPage() {
   const router = useRouter();
   const { session, loading, isAdmin, user } = useAuth();
-  const [tab, setTab] = useState<"kyc" | "appointments">("kyc");
+  const [tab, setTab] = useState<"kyc" | "appointments" | "users">("kyc");
   const [kyc, setKyc] = useState<Kyc[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [profiles, setProfiles] = useState<Record<string, Profile>>({});
+  const [users, setUsers] = useState<Profile[]>([]);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [dataLoading, setDataLoading] = useState(true);
 
@@ -53,15 +54,18 @@ function AdminPage() {
     const [{ data: kycData }, { data: apptData }, { data: profData }] = await Promise.all([
       supabase.from("kyc_submissions").select("*").order("created_at", { ascending: false }),
       supabase.from("appointments").select("*").order("created_at", { ascending: false }),
-      supabase.from("profiles").select("id, email, full_name"),
+      supabase.from("profiles").select("id, email, full_name, balance, blocked"),
     ]);
     setKyc((kycData ?? []) as Kyc[]);
     setAppointments((apptData ?? []) as Appointment[]);
+    const list = (profData ?? []) as Profile[];
     const map: Record<string, Profile> = {};
-    (profData ?? []).forEach((p) => (map[p.id] = p as Profile));
+    list.forEach((p) => (map[p.id] = p));
     setProfiles(map);
+    setUsers(list);
     setDataLoading(false);
   }, []);
+
 
   useEffect(() => {
     if (!loading && !session) {
