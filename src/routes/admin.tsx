@@ -319,6 +319,53 @@ function AdminPage() {
                 </div>
               ))}
             </div>
+          ) : (
+            <div className="mt-8 space-y-4">
+              {users.length === 0 && <p className="text-muted-foreground">No users yet.</p>}
+              {users.map((u) => (
+                <div key={u.id} className={`flex flex-col gap-4 border p-5 md:flex-row md:items-center md:justify-between ${u.blocked ? "border-red-500/60 bg-red-500/5" : "border-border bg-secondary"}`}>
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10">
+                      <Users className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-heading text-base font-bold text-foreground">{u.full_name || u.email || u.id.slice(0, 8)}</p>
+                      <p className="text-sm text-muted-foreground">{u.email}</p>
+                      <div className="mt-1 flex items-center gap-3">
+                        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                          <Wallet className="h-4 w-4 text-primary" /> ${Number(u.balance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                        {u.blocked && (
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500/15 px-3 py-1 text-xs font-semibold text-red-700">
+                            <Ban className="h-3.5 w-3.5" /> Blocked
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      disabled={busyId === u.id}
+                      onClick={() => fundUser(u)}
+                      className="inline-flex items-center gap-1.5 bg-green-600 px-3 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-60"
+                    >
+                      {busyId === u.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wallet className="h-4 w-4" />} Fund
+                    </button>
+                    <button
+                      disabled={busyId === u.id}
+                      onClick={() => toggleBlock(u)}
+                      className={`inline-flex items-center gap-1.5 border px-3 py-2 text-sm font-semibold disabled:opacity-60 ${
+                        u.blocked
+                          ? "border-border text-foreground hover:bg-background"
+                          : "border-red-500 text-red-600 hover:bg-red-500/10"
+                      }`}
+                    >
+                      {u.blocked ? <><ShieldOff className="h-4 w-4" /> Unblock</> : <><Ban className="h-4 w-4" /> Block</>}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </section>
