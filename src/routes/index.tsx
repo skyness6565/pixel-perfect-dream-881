@@ -39,8 +39,8 @@ function Index() {
           height={1080}
           className="absolute inset-0 h-full w-full object-cover object-top"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/30 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
 
         {/* Logo lockup, right side */}
         <div className="absolute right-6 top-1/2 hidden -translate-y-1/2 flex-col items-center lg:flex lg:right-20">
