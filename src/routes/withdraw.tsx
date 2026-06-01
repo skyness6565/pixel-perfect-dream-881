@@ -81,8 +81,14 @@ const LATEST_NEWS = [
 const AVAILABLE_BALANCE = 1250.0;
 
 function WithdrawPage() {
+  const router = useRouter();
+  const { session, loading, kycStatus } = useAuth();
   const [submitted, setSubmitted] = useState(false);
   const [amount, setAmount] = useState("");
+
+  useEffect(() => {
+    if (!loading && !session) router.navigate({ to: "/auth" });
+  }, [loading, session, router]);
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -92,8 +98,60 @@ function WithdrawPage() {
     }
   }
 
+  if (loading || !session) {
+    return (
+      <div className="min-h-screen bg-background">
+        <SiteHeader />
+        <div className="flex h-[60vh] items-center justify-center text-muted-foreground">Loading…</div>
+        <SiteFooter />
+      </div>
+    );
+  }
+
+  // Block withdrawals until KYC is approved
+  if (kycStatus !== "approved") {
+    const pending = kycStatus === "pending";
+    return (
+      <div className="min-h-screen bg-background">
+        <SiteHeader />
+        <section className="relative h-[40vh] min-h-[300px] w-full overflow-hidden">
+          <img src={BANNER} alt="George Strait" className="absolute inset-0 h-full w-full object-cover object-center" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-black/40" />
+        </section>
+        <section className="py-16">
+          <div className="mx-auto max-w-2xl px-6">
+            <div className="flex items-start gap-4 border border-border bg-secondary p-8">
+              {pending ? (
+                <Clock className="mt-0.5 h-8 w-8 shrink-0 text-yellow-600" />
+              ) : (
+                <ShieldAlert className="mt-0.5 h-8 w-8 shrink-0 text-primary" />
+              )}
+              <div>
+                <h1 className="font-display text-3xl text-foreground">
+                  {pending ? "Verification pending" : "Verify your identity first"}
+                </h1>
+                <p className="mt-2 text-muted-foreground">
+                  {pending
+                    ? "Your ID is being reviewed by our team. Withdrawals will unlock as soon as an admin approves your verification."
+                    : "Withdrawals are locked until your identity verification (KYC) has been approved. Please submit your ID to continue."}
+                </p>
+                {!pending && (
+                  <Link to="/kyc" className="mt-5 inline-flex items-center gap-2 bg-foreground px-6 py-3 font-heading text-sm font-semibold uppercase tracking-wide text-background transition-colors hover:bg-primary">
+                    <ShieldCheck className="h-4 w-4" /> Complete verification
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+        <SiteFooter />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
+
       <SiteHeader />
 
       {/* Hero banner */}
