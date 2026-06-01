@@ -13,7 +13,10 @@ import { Route as WithdrawRouteImport } from './routes/withdraw'
 import { Route as StoreRouteImport } from './routes/store'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as NewsRouteImport } from './routes/news'
+import { Route as KycRouteImport } from './routes/kyc'
 import { Route as FanClubRouteImport } from './routes/fan-club'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutGeorgeRouteImport } from './routes/about-george'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -37,9 +40,24 @@ const NewsRoute = NewsRouteImport.update({
   path: '/news',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KycRoute = KycRouteImport.update({
+  id: '/kyc',
+  path: '/kyc',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FanClubRoute = FanClubRouteImport.update({
   id: '/fan-club',
   path: '/fan-club',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutGeorgeRoute = AboutGeorgeRouteImport.update({
@@ -56,7 +74,10 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about-george': typeof AboutGeorgeRoute
+  '/account': typeof AccountRoute
+  '/auth': typeof AuthRoute
   '/fan-club': typeof FanClubRoute
+  '/kyc': typeof KycRoute
   '/news': typeof NewsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/store': typeof StoreRoute
@@ -65,7 +86,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about-george': typeof AboutGeorgeRoute
+  '/account': typeof AccountRoute
+  '/auth': typeof AuthRoute
   '/fan-club': typeof FanClubRoute
+  '/kyc': typeof KycRoute
   '/news': typeof NewsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/store': typeof StoreRoute
@@ -75,7 +99,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about-george': typeof AboutGeorgeRoute
+  '/account': typeof AccountRoute
+  '/auth': typeof AuthRoute
   '/fan-club': typeof FanClubRoute
+  '/kyc': typeof KycRoute
   '/news': typeof NewsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/store': typeof StoreRoute
@@ -86,7 +113,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about-george'
+    | '/account'
+    | '/auth'
     | '/fan-club'
+    | '/kyc'
     | '/news'
     | '/sitemap.xml'
     | '/store'
@@ -95,7 +125,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about-george'
+    | '/account'
+    | '/auth'
     | '/fan-club'
+    | '/kyc'
     | '/news'
     | '/sitemap.xml'
     | '/store'
@@ -104,7 +137,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about-george'
+    | '/account'
+    | '/auth'
     | '/fan-club'
+    | '/kyc'
     | '/news'
     | '/sitemap.xml'
     | '/store'
@@ -114,7 +150,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutGeorgeRoute: typeof AboutGeorgeRoute
+  AccountRoute: typeof AccountRoute
+  AuthRoute: typeof AuthRoute
   FanClubRoute: typeof FanClubRoute
+  KycRoute: typeof KycRoute
   NewsRoute: typeof NewsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StoreRoute: typeof StoreRoute
@@ -151,11 +190,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NewsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/kyc': {
+      id: '/kyc'
+      path: '/kyc'
+      fullPath: '/kyc'
+      preLoaderRoute: typeof KycRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/fan-club': {
       id: '/fan-club'
       path: '/fan-club'
       fullPath: '/fan-club'
       preLoaderRoute: typeof FanClubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about-george': {
@@ -178,7 +238,10 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutGeorgeRoute: AboutGeorgeRoute,
+  AccountRoute: AccountRoute,
+  AuthRoute: AuthRoute,
   FanClubRoute: FanClubRoute,
+  KycRoute: KycRoute,
   NewsRoute: NewsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StoreRoute: StoreRoute,
