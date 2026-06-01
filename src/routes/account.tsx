@@ -119,6 +119,20 @@ function AccountPage() {
             </span>
           </div>
 
+          <div className="mt-8 flex items-center gap-4 border border-border bg-secondary p-6">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+              <Wallet className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <p className="font-heading text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Account Balance
+              </p>
+              <p className="font-display text-3xl text-foreground">
+                ${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+            </div>
+          </div>
+
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <Link to="/book-appointment" className="group border border-border bg-secondary p-6 transition-colors hover:border-primary">
               <CalendarDays className="h-8 w-8 text-primary" />
