@@ -39,8 +39,8 @@ function Index() {
           height={1080}
           className="absolute inset-0 h-full w-full object-cover object-top"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/30 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
 
         {/* Logo lockup, right side */}
         <div className="absolute right-6 top-1/2 hidden -translate-y-1/2 flex-col items-center lg:flex lg:right-20">
@@ -49,11 +49,11 @@ function Index() {
               className="h-44 w-44 fill-accent text-accent xl:h-56 xl:w-56"
               strokeWidth={0.5}
             />
-            <span className="absolute font-display text-7xl text-foreground xl:text-8xl">
+            <span className="absolute font-display text-7xl text-white xl:text-8xl">
               SG
             </span>
           </div>
-          <h1 className="mt-2 text-center font-display text-6xl leading-[0.85] text-foreground xl:text-7xl">
+          <h1 className="mt-2 text-center font-display text-6xl leading-[0.85] text-white xl:text-7xl">
             GEORGE
             <br />
             STRAIT
