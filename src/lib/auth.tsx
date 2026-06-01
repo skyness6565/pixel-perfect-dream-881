@@ -99,6 +99,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(null);
     setIsAdmin(false);
     setKycStatus("none");
+    setBlocked(false);
+    setBalance(0);
   }
 
   return (
@@ -108,6 +110,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user: session?.user ?? null,
         loading,
         isAdmin,
+        blocked,
+        balance,
         kycStatus,
         refresh,
         signOut,
