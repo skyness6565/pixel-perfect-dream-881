@@ -4,7 +4,7 @@ import { Link } from "@tanstack/react-router";
 const COL_ONE: { label: string; to: string }[] = [
   { label: "Home", to: "/" },
   { label: "About George", to: "/about-george" },
-  { label: "News", to: "/" },
+  { label: "News", to: "/news" },
   { label: "Store", to: "/" },
   { label: "Fan Club", to: "/" },
 ];
