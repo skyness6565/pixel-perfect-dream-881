@@ -1,8 +1,9 @@
 import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { CalendarDays, ShieldCheck, Banknote, LogOut, Clock, XCircle, CheckCircle2, CheckCheck } from "lucide-react";
+import { CalendarDays, ShieldCheck, Banknote, LogOut, Clock, XCircle, CheckCircle2, CheckCheck, Wallet } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { BlockedNotice } from "@/components/blocked-notice";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 
