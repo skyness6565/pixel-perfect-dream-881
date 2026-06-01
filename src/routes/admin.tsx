@@ -225,6 +225,7 @@ function AdminPage() {
             {([
               { key: "kyc", label: `KYC Submissions (${kyc.length})` },
               { key: "appointments", label: `Appointments (${appointments.length})` },
+              { key: "users", label: `Users (${users.length})` },
             ] as const).map((t) => (
               <button
                 key={t.key}
