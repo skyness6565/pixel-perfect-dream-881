@@ -3,6 +3,7 @@ import { useState, useEffect, type FormEvent } from "react";
 import { CheckCircle2, ExternalLink, Banknote, ShieldCheck, ShieldAlert, Clock } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { BlockedNotice } from "@/components/blocked-notice";
 import { useAuth } from "@/lib/auth";
 
 const MEDIA = "https://georgestrait.com/media";
