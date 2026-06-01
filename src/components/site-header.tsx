@@ -41,7 +41,7 @@ export function SiteHeader() {
         </nav>
 
         <button
-          className="text-foreground lg:hidden"
+          className="text-white lg:hidden"
           onClick={() => setOpen((v) => !v)}
           aria-label="Toggle menu"
         >
