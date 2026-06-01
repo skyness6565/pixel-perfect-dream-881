@@ -43,9 +43,9 @@ function AboutGeorge() {
           alt="George Strait"
           className="absolute inset-0 h-full w-full object-cover object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-background/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/40" />
         <div className="absolute inset-x-0 bottom-0 mx-auto max-w-5xl px-6 pb-8">
-          <h1 className="font-display text-5xl text-foreground md:text-6xl">
+          <h1 className="font-display text-5xl text-white md:text-6xl">
             About George
           </h1>
         </div>
