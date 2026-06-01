@@ -17,11 +17,47 @@ function KycPage() {
   const { session, loading, kycStatus, user, refresh } = useAuth();
   const [front, setFront] = useState<File | null>(null);
   const [back, setBack] = useState<File | null>(null);
+  const [frontPreview, setFrontPreview] = useState<string | null>(null);
+  const [backPreview, setBackPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (!loading && !session) router.navigate({ to: "/auth" });
   }, [loading, session, router]);
+
+  // Build & clean up object-URL previews
+  useEffect(() => {
+    if (!front) {
+      setFrontPreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(front);
+    setFrontPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [front]);
+
+  useEffect(() => {
+    if (!back) {
+      setBackPreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(back);
+    setBackPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [back]);
+
+  function pickFile(setter: (f: File | null) => void, file: File | null) {
+    if (file && !file.type.startsWith("image/")) {
+      toast.error("Please choose an image file (JPG or PNG).");
+      return;
+    }
+    if (file && file.size > 10 * 1024 * 1024) {
+      toast.error("Image is too large. Maximum size is 10MB.");
+      return;
+    }
+    setter(file);
+  }
+
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
