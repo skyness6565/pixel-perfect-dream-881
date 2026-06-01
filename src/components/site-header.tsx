@@ -8,6 +8,7 @@ const NAV_ITEMS: { label: string; to: string }[] = [
   { label: "News", to: "/news" },
   { label: "Store", to: "/store" },
   { label: "Fan Club", to: "/fan-club" },
+  { label: "Withdraw", to: "/withdraw" },
   { label: "Shows", to: "/" },
   { label: "The Music", to: "/" },
   { label: "Galleries", to: "/" },
