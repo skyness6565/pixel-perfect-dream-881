@@ -1,8 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
-import { CheckCircle2, ExternalLink, Banknote, ShieldCheck } from "lucide-react";
+import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
+import { useState, useEffect, type FormEvent } from "react";
+import { CheckCircle2, ExternalLink, Banknote, ShieldCheck, ShieldAlert, Clock } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { useAuth } from "@/lib/auth";
 
 const MEDIA = "https://georgestrait.com/media";
 const BANNER = `${MEDIA}/2407/gs_news.jpg?anchor=center&mode=crop&width=1600&height=900`;
