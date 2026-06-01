@@ -2,6 +2,7 @@ import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   ShieldCheck, Loader2, CheckCircle2, XCircle, Clock, CalendarDays, Eye, ArrowLeft,
+  Users, Wallet, Ban, ShieldOff,
 } from "lucide-react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
@@ -14,7 +15,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-type Profile = { id: string; email: string | null; full_name: string | null };
+type Profile = { id: string; email: string | null; full_name: string | null; balance: number; blocked: boolean };
 type Kyc = {
   id: string;
   user_id: string;
