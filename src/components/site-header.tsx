@@ -17,11 +17,11 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="absolute inset-x-0 top-0 z-50 bg-background/70 backdrop-blur-sm">
+    <header className="absolute inset-x-0 top-0 z-50 bg-gradient-to-b from-black/70 to-transparent">
       <div className="mx-auto flex h-20 max-w-[1600px] items-center justify-between px-5 lg:px-10">
         <Link
           to="/"
-          className="font-display text-2xl tracking-tight text-foreground lg:text-3xl"
+          className="font-display text-2xl tracking-tight text-white lg:text-3xl"
         >
           GEORGE STRAIT
         </Link>
@@ -31,8 +31,8 @@ export function SiteHeader() {
             <Link
               key={item.label}
               to={item.to}
-              className="relative font-heading text-sm font-medium uppercase tracking-wide text-foreground/85 transition-colors hover:text-primary"
-              activeProps={{ className: "text-foreground" }}
+              className="relative font-heading text-sm font-medium uppercase tracking-wide text-white/85 transition-colors hover:text-primary"
+              activeProps={{ className: "text-white" }}
               activeOptions={{ exact: true }}
             >
               {item.label}
