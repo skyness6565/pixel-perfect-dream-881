@@ -49,11 +49,11 @@ function Index() {
               className="h-44 w-44 fill-accent text-accent xl:h-56 xl:w-56"
               strokeWidth={0.5}
             />
-            <span className="absolute font-display text-7xl text-foreground xl:text-8xl">
+            <span className="absolute font-display text-7xl text-white xl:text-8xl">
               SG
             </span>
           </div>
-          <h1 className="mt-2 text-center font-display text-6xl leading-[0.85] text-foreground xl:text-7xl">
+          <h1 className="mt-2 text-center font-display text-6xl leading-[0.85] text-white xl:text-7xl">
             GEORGE
             <br />
             STRAIT
