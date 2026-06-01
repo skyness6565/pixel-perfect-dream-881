@@ -14,6 +14,7 @@ import { Route as StoreRouteImport } from './routes/store'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as NewsRouteImport } from './routes/news'
 import { Route as FanClubRouteImport } from './routes/fan-club'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutGeorgeRouteImport } from './routes/about-george'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -42,6 +43,11 @@ const FanClubRoute = FanClubRouteImport.update({
   path: '/fan-club',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutGeorgeRoute = AboutGeorgeRouteImport.update({
   id: '/about-george',
   path: '/about-george',
@@ -56,6 +62,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about-george': typeof AboutGeorgeRoute
+  '/auth': typeof AuthRoute
   '/fan-club': typeof FanClubRoute
   '/news': typeof NewsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -65,6 +72,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about-george': typeof AboutGeorgeRoute
+  '/auth': typeof AuthRoute
   '/fan-club': typeof FanClubRoute
   '/news': typeof NewsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -75,6 +83,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about-george': typeof AboutGeorgeRoute
+  '/auth': typeof AuthRoute
   '/fan-club': typeof FanClubRoute
   '/news': typeof NewsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -86,6 +95,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about-george'
+    | '/auth'
     | '/fan-club'
     | '/news'
     | '/sitemap.xml'
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about-george'
+    | '/auth'
     | '/fan-club'
     | '/news'
     | '/sitemap.xml'
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about-george'
+    | '/auth'
     | '/fan-club'
     | '/news'
     | '/sitemap.xml'
@@ -114,6 +126,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutGeorgeRoute: typeof AboutGeorgeRoute
+  AuthRoute: typeof AuthRoute
   FanClubRoute: typeof FanClubRoute
   NewsRoute: typeof NewsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -158,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FanClubRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about-george': {
       id: '/about-george'
       path: '/about-george'
@@ -178,6 +198,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutGeorgeRoute: AboutGeorgeRoute,
+  AuthRoute: AuthRoute,
   FanClubRoute: FanClubRoute,
   NewsRoute: NewsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
@@ -187,3 +208,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
