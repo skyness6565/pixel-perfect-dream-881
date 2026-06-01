@@ -96,6 +96,21 @@ function AdminPage() {
     setBusyId(null);
   }
 
+  async function updateAppointment(id: string, status: string) {
+    setBusyId(id);
+    const { error } = await supabase
+      .from("appointments")
+      .update({ status })
+      .eq("id", id);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success(`Appointment marked ${status}`);
+      setAppointments((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
+    }
+    setBusyId(null);
+  }
+
   if (loading || !session) {
     return (
       <div className="min-h-screen bg-background">
