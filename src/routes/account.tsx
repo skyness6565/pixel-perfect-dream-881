@@ -69,6 +69,10 @@ function AccountPage() {
     );
   }
 
+  if (blocked) {
+    return <BlockedNotice />;
+  }
+
   const kycBadge = {
     none: { label: "Not started", cls: "bg-secondary text-muted-foreground", Icon: Clock },
     pending: { label: "Pending review", cls: "bg-yellow-500/15 text-yellow-700", Icon: Clock },
