@@ -2,7 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ExternalLink } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import heroImg from "@/assets/hero-strait.jpg";
+
+const MEDIA = "https://georgestrait.com/media";
+const card = (path: string) =>
+  `${MEDIA}/${path}?anchor=center&mode=crop&width=1140&height=550`;
+
+const BANNER = `${MEDIA}/2407/gs_news.jpg?anchor=center&mode=crop&width=1600&height=900`;
+const ALBUM_COVER = `${MEDIA}/2947/george-strait-cowboys-and-dreamers.jpg?width=600&height=600`;
+const LISTEN_URL = "https://strm.to/cowboysanddreamerswe";
 
 export const Route = createFileRoute("/news")({
   head: () => ({
@@ -20,7 +27,7 @@ export const Route = createFileRoute("/news")({
           "Official press releases and the latest news from country legend George Strait.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: heroImg },
+      { property: "og:image", content: BANNER },
     ],
   }),
   component: NewsPage,
@@ -47,7 +54,7 @@ const ARTICLES: Article[] = [
     date: "28 Jul 2025",
     categories: ["Touring"],
     comments: "0 comments",
-    image: heroImg,
+    image: card("2965/gsn_250728_pic.jpg"),
   },
   {
     title:
@@ -59,7 +66,7 @@ const ARTICLES: Article[] = [
     ],
     date: "11 Jul 2025",
     categories: ["Touring"],
-    image: heroImg,
+    image: card("2963/gsn_250711_pic.jpg"),
   },
   {
     title:
@@ -69,7 +76,7 @@ const ARTICLES: Article[] = [
     body: ["Tickets on Sale Friday, Feb. 21 at 10 a.m. Local Time via GeorgeStrait.com"],
     date: "12 Feb 2025",
     categories: ["Touring", "Albums & Music"],
-    image: heroImg,
+    image: card("2961/gsn_250212.jpg"),
   },
   {
     title:
@@ -78,7 +85,7 @@ const ARTICLES: Article[] = [
       "Country Music's Biggest Night\u2122 to Broadcast Live from Nashville Wednesday, Nov. 20 at 8/7c on ABC",
     date: "12 Nov 2024",
     categories: ["Albums & Music", "Awards"],
-    image: heroImg,
+    image: card("2950/gs_121124.jpg"),
   },
   {
     title: "GEORGE STRAIT'S COWBOYS AND DREAMERS ARRIVES",
@@ -86,7 +93,7 @@ const ARTICLES: Article[] = [
       "The King of Country Music's 31st Studio Album for MCA is Associated Press' Album of the Week",
     date: "06 Sep 2024",
     categories: ["Albums & Music"],
-    image: heroImg,
+    image: card("2949/gs_240906.jpg"),
   },
   {
     title:
@@ -95,7 +102,7 @@ const ARTICLES: Article[] = [
       "Strait Also Holds the Record for Largest Indoor Concert in North America with 104,793 Fans at AT&T Stadium for The Cowboy Rides Away Tour in June 2014",
     date: "15 Jun 2024",
     categories: ["Touring", "Albums & Music"],
-    image: heroImg,
+    image: card("2948/gs_240715.jpg"),
   },
   {
     title:
@@ -106,7 +113,7 @@ const ARTICLES: Article[] = [
     ],
     date: "06 May 2024",
     categories: ["Albums & Music", "Touring"],
-    image: heroImg,
+    image: card("2959/gsn_050524.jpg"),
   },
   {
     title:
@@ -115,7 +122,7 @@ const ARTICLES: Article[] = [
       "June 15 Show Boasts over 100K Fans Holding Tickets-and-Counting for Only Texas Date + Only Show In-The-Round",
     date: "11 Apr 2024",
     categories: ["Touring", "Albums & Music"],
-    image: heroImg,
+    image: card("2945/240319_header.jpg"),
   },
 ];
 
@@ -168,9 +175,9 @@ function NewsPage() {
       {/* Hero banner */}
       <section className="relative h-[60vh] min-h-[420px] w-full overflow-hidden">
         <img
-          src={heroImg}
+          src={BANNER}
           alt="George Strait waving to the crowd"
-          className="absolute inset-0 h-full w-full object-cover object-top"
+          className="absolute inset-0 h-full w-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-black/40" />
       </section>
@@ -196,7 +203,7 @@ function NewsPage() {
                     <img
                       src={article.image}
                       alt={article.title}
-                      className="aspect-[16/9] w-full object-cover object-top"
+                      className="aspect-[1140/550] w-full object-cover object-center"
                     />
                   </div>
                   <h2 className="mt-6 font-display text-2xl uppercase leading-tight text-foreground md:text-3xl">
@@ -291,14 +298,15 @@ function NewsPage() {
             <div className="bg-foreground p-5 text-background">
               <div className="overflow-hidden">
                 <img
-                  src={heroImg}
+                  src={ALBUM_COVER}
                   alt="George Strait — Cowboys and Dreamers"
                   className="aspect-square w-full object-cover"
                 />
               </div>
-              <p className="mt-4 font-display text-xl">Cowboys and Dreamers</p>
               <a
-                href="#"
+                href={LISTEN_URL}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="mt-4 inline-flex items-center gap-2 border border-background px-5 py-2.5 font-heading text-sm font-semibold uppercase tracking-wide transition-colors hover:bg-background hover:text-foreground"
               >
                 Listen Now <ExternalLink className="h-4 w-4" />
