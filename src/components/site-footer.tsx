@@ -29,26 +29,26 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-5xl grid-cols-1 gap-10 px-6 text-center md:grid-cols-3">
         <ul className="space-y-3">
           {COL_ONE.map((item) => (
-            <li key={item}>
-              <a
-                href="#home"
+            <li key={item.label}>
+              <Link
+                to={item.to}
                 className="font-heading text-base text-foreground/90 transition-colors hover:text-primary"
               >
-                {item}
-              </a>
+                {item.label}
+              </Link>
             </li>
           ))}
         </ul>
 
         <ul className="space-y-3">
           {COL_TWO.map((item) => (
-            <li key={item}>
-              <a
-                href="#home"
+            <li key={item.label}>
+              <Link
+                to={item.to}
                 className="font-heading text-base text-foreground/90 transition-colors hover:text-primary"
               >
-                {item}
-              </a>
+                {item.label}
+              </Link>
             </li>
           ))}
         </ul>
