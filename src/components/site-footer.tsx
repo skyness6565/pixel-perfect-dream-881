@@ -5,7 +5,7 @@ const COL_ONE: { label: string; to: string }[] = [
   { label: "Home", to: "/" },
   { label: "About George", to: "/about-george" },
   { label: "News", to: "/news" },
-  { label: "Store", to: "/" },
+  { label: "Store", to: "/store" },
   { label: "Fan Club", to: "/" },
 ];
 const COL_TWO: { label: string; to: string }[] = [
