@@ -11,8 +11,9 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { AuthProvider } from "../lib/auth";
+import { AuthProvider, useAuth } from "../lib/auth";
 import { Toaster } from "../components/ui/sonner";
+import { initPerfLogging, trackRouterPerf } from "../lib/perf";
 
 function NotFoundComponent() {
   return (
@@ -119,12 +120,38 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function RoutePrefetcher() {
+  const router = useRouter();
+  const { session, isAdmin } = useAuth();
+
+  // Start perf logging + router timing once on the client.
+  useEffect(() => {
+    initPerfLogging();
+    const off = trackRouterPerf(router as never);
+    return off;
+  }, [router]);
+
+  // Prefetch account/admin routes as soon as the user is known, so those
+  // navigations are already cached and feel instant on click.
+  useEffect(() => {
+    if (!session) return;
+    void router.preloadRoute({ to: "/account" });
+    void router.preloadRoute({ to: "/withdraw" });
+    void router.preloadRoute({ to: "/book-appointment" });
+    void router.preloadRoute({ to: "/kyc" });
+    if (isAdmin) void router.preloadRoute({ to: "/admin" });
+  }, [router, session, isAdmin]);
+
+  return null;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <RoutePrefetcher />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <Toaster position="top-center" richColors />
@@ -132,3 +159,4 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
+
