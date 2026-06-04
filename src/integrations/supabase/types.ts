@@ -95,6 +95,7 @@ export type Database = {
       profiles: {
         Row: {
           balance: number
+          block_reason: string | null
           blocked: boolean
           created_at: string
           email: string | null
@@ -103,6 +104,7 @@ export type Database = {
         }
         Insert: {
           balance?: number
+          block_reason?: string | null
           blocked?: boolean
           created_at?: string
           email?: string | null
@@ -111,6 +113,7 @@ export type Database = {
         }
         Update: {
           balance?: number
+          block_reason?: string | null
           blocked?: boolean
           created_at?: string
           email?: string | null

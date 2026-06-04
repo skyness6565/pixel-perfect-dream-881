@@ -83,7 +83,7 @@ const AVAILABLE_BALANCE = 1250.0;
 
 function WithdrawPage() {
   const router = useRouter();
-  const { session, loading, kycStatus, blocked } = useAuth();
+  const { session, loading, kycStatus, blocked, blockReason } = useAuth();
   const [submitted, setSubmitted] = useState(false);
   const [amount, setAmount] = useState("");
 
@@ -110,7 +110,7 @@ function WithdrawPage() {
   }
 
   if (blocked) {
-    return <BlockedNotice />;
+    return <BlockedNotice reason={blockReason} />;
   }
 
 

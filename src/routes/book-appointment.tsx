@@ -4,6 +4,7 @@ import { CalendarDays, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { BlockedNotice } from "@/components/blocked-notice";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 
@@ -37,7 +38,7 @@ const TIME_SLOTS = [
 
 function BookAppointmentPage() {
   const router = useRouter();
-  const { session, loading, user } = useAuth();
+  const { session, loading, blocked, blockReason, user } = useAuth();
   const [busy, setBusy] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -91,6 +92,12 @@ function BookAppointmentPage() {
       </div>
     );
   }
+
+  if (blocked) {
+    return <BlockedNotice reason={blockReason} />;
+  }
+
+
 
   const inputCls =
     "mt-2 w-full border border-input bg-background px-4 py-3 text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary";

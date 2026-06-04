@@ -14,6 +14,7 @@ type AuthContextValue = {
   loading: boolean;
   isAdmin: boolean;
   blocked: boolean;
+  blockReason: string | null;
   balance: number;
   kycStatus: "none" | "pending" | "approved" | "rejected";
   refresh: () => Promise<void>;
@@ -27,6 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [blocked, setBlocked] = useState(false);
+  const [blockReason, setBlockReason] = useState<string | null>(null);
   const [balance, setBalance] = useState(0);
   const [kycStatus, setKycStatus] =
     useState<AuthContextValue["kycStatus"]>("none");
@@ -36,6 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsAdmin(false);
       setKycStatus("none");
       setBlocked(false);
+      setBlockReason(null);
       setBalance(0);
       return;
     }
@@ -49,12 +52,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .limit(1),
       supabase
         .from("profiles")
-        .select("balance, blocked")
+        .select("balance, blocked, block_reason")
         .eq("id", uid)
         .maybeSingle(),
     ]);
     setIsAdmin(!!roles?.some((r) => r.role === "admin"));
     setBlocked(!!profile?.blocked);
+    setBlockReason((profile?.block_reason as string | null) ?? null);
     setBalance(Number(profile?.balance ?? 0));
     if (kyc && kyc.length > 0) {
       setKycStatus(kyc[0].status as AuthContextValue["kycStatus"]);
@@ -100,6 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsAdmin(false);
     setKycStatus("none");
     setBlocked(false);
+    setBlockReason(null);
     setBalance(0);
   }
 
@@ -111,6 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         isAdmin,
         blocked,
+        blockReason,
         balance,
         kycStatus,
         refresh,

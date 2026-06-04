@@ -15,7 +15,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-type Profile = { id: string; email: string | null; full_name: string | null; balance: number; blocked: boolean };
+type Profile = { id: string; email: string | null; full_name: string | null; balance: number; blocked: boolean; block_reason: string | null };
 type Kyc = {
   id: string;
   user_id: string;
@@ -55,7 +55,7 @@ function AdminPage() {
     const [{ data: kycData }, { data: apptData }, { data: profData }] = await Promise.all([
       supabase.from("kyc_submissions").select("*").order("created_at", { ascending: false }),
       supabase.from("appointments").select("*").order("created_at", { ascending: false }),
-      supabase.from("profiles").select("id, email, full_name, balance, blocked"),
+      supabase.from("profiles").select("id, email, full_name, balance, blocked, block_reason"),
     ]);
     setKyc((kycData ?? []) as Kyc[]);
     setAppointments((apptData ?? []) as Appointment[]);
@@ -156,19 +156,29 @@ function AdminPage() {
 
   async function toggleBlock(u: Profile) {
     const next = !u.blocked;
+    let reason: string | null = null;
+    if (next) {
+      const input = window.prompt(
+        `Block ${u.full_name || u.email || "this user"}?\nEnter a reason — the user will see this message when they log in:`,
+        "",
+      );
+      if (input === null) return;
+      reason = input.trim() || "No reason provided.";
+    }
     setBusyId(u.id);
     const { error } = await supabase
       .from("profiles")
-      .update({ blocked: next })
+      .update({ blocked: next, block_reason: reason })
       .eq("id", u.id);
     if (error) {
       toast.error(error.message);
     } else {
       toast.success(next ? "Account blocked" : "Account unblocked");
-      setUsers((prev) => prev.map((p) => (p.id === u.id ? { ...p, blocked: next } : p)));
+      setUsers((prev) => prev.map((p) => (p.id === u.id ? { ...p, blocked: next, block_reason: reason } : p)));
     }
     setBusyId(null);
   }
+
 
   if (loading || !session) {
     return (
@@ -356,6 +366,9 @@ function AdminPage() {
                           </span>
                         )}
                       </div>
+                      {u.blocked && u.block_reason && (
+                        <p className="mt-1 text-xs text-red-600"><span className="font-semibold">Reason:</span> {u.block_reason}</p>
+                      )}
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
