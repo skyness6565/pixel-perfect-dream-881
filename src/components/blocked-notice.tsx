@@ -4,7 +4,7 @@ import { SiteFooter } from "@/components/site-footer";
 
 export const SUPPORT_EMAIL = "support@georgestrait-fanclub.com";
 
-export function BlockedNotice() {
+export function BlockedNotice({ reason }: { reason?: string | null }) {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
@@ -14,7 +14,15 @@ export function BlockedNotice() {
           <h1 className="mt-6 font-display text-4xl font-extrabold uppercase tracking-tight text-red-600 md:text-5xl">
             This account has been blocked
           </h1>
-          <p className="mt-4 text-lg font-semibold text-foreground">
+          {reason && (
+            <div className="mx-auto mt-6 max-w-xl border border-red-500/40 bg-background/60 p-5 text-left">
+              <p className="font-heading text-xs font-bold uppercase tracking-widest text-red-600">
+                Reason
+              </p>
+              <p className="mt-2 text-base font-medium text-foreground">{reason}</p>
+            </div>
+          )}
+          <p className="mt-6 text-lg font-semibold text-foreground">
             Please reach out to us through email.
           </p>
           <a
