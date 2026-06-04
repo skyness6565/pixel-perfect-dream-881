@@ -55,7 +55,7 @@ function AdminPage() {
     const [{ data: kycData }, { data: apptData }, { data: profData }] = await Promise.all([
       supabase.from("kyc_submissions").select("*").order("created_at", { ascending: false }),
       supabase.from("appointments").select("*").order("created_at", { ascending: false }),
-      supabase.from("profiles").select("id, email, full_name, balance, blocked"),
+      supabase.from("profiles").select("id, email, full_name, balance, blocked, block_reason"),
     ]);
     setKyc((kycData ?? []) as Kyc[]);
     setAppointments((apptData ?? []) as Appointment[]);
