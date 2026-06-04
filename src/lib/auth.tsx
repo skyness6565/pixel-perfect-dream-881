@@ -12,6 +12,7 @@ type AuthContextValue = {
   session: Session | null;
   user: User | null;
   loading: boolean;
+  metaLoading: boolean;
   isAdmin: boolean;
   blocked: boolean;
   blockReason: string | null;
@@ -26,6 +27,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [metaLoading, setMetaLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [blocked, setBlocked] = useState(false);
   const [blockReason, setBlockReason] = useState<string | null>(null);
@@ -40,30 +42,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setBlocked(false);
       setBlockReason(null);
       setBalance(0);
+      setMetaLoading(false);
       return;
     }
-    const [{ data: roles }, { data: kyc }, { data: profile }] = await Promise.all([
-      supabase.from("user_roles").select("role").eq("user_id", uid),
-      supabase
-        .from("kyc_submissions")
-        .select("status")
-        .eq("user_id", uid)
-        .order("created_at", { ascending: false })
-        .limit(1),
-      supabase
-        .from("profiles")
-        .select("balance, blocked, block_reason")
-        .eq("id", uid)
-        .maybeSingle(),
-    ]);
-    setIsAdmin(!!roles?.some((r) => r.role === "admin"));
-    setBlocked(!!profile?.blocked);
-    setBlockReason((profile?.block_reason as string | null) ?? null);
-    setBalance(Number(profile?.balance ?? 0));
-    if (kyc && kyc.length > 0) {
-      setKycStatus(kyc[0].status as AuthContextValue["kycStatus"]);
-    } else {
-      setKycStatus("none");
+    setMetaLoading(true);
+    try {
+      const [{ data: roles }, { data: kyc }, { data: profile }] = await Promise.all([
+        supabase.from("user_roles").select("role").eq("user_id", uid),
+        supabase
+          .from("kyc_submissions")
+          .select("status")
+          .eq("user_id", uid)
+          .order("created_at", { ascending: false })
+          .limit(1),
+        supabase
+          .from("profiles")
+          .select("balance, blocked, block_reason")
+          .eq("id", uid)
+          .maybeSingle(),
+      ]);
+      setIsAdmin(!!roles?.some((r) => r.role === "admin"));
+      setBlocked(!!profile?.blocked);
+      setBlockReason((profile?.block_reason as string | null) ?? null);
+      setBalance(Number(profile?.balance ?? 0));
+      if (kyc && kyc.length > 0) {
+        setKycStatus(kyc[0].status as AuthContextValue["kycStatus"]);
+      } else {
+        setKycStatus("none");
+      }
+    } finally {
+      setMetaLoading(false);
     }
   }
 
@@ -79,15 +87,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(({ data }) => {
       if (!mounted) return;
       setSession(data.session);
-      loadUserMeta(data.session?.user?.id).finally(() => {
-        if (mounted) setLoading(false);
-      });
+      // Session is known — let the app render immediately. Metadata
+      // (roles, balance, blocked status) loads in the background.
+      setLoading(false);
+      loadUserMeta(data.session?.user?.id);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession);
+      setLoading(false);
       // defer supabase calls out of the callback
       setTimeout(() => loadUserMeta(newSession?.user?.id), 0);
     });
@@ -98,6 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+
   async function signOut() {
     await supabase.auth.signOut();
     setSession(null);
@@ -106,6 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setBlocked(false);
     setBlockReason(null);
     setBalance(0);
+    setMetaLoading(false);
   }
 
   return (
@@ -114,6 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         session,
         user: session?.user ?? null,
         loading,
+        metaLoading,
         isAdmin,
         blocked,
         blockReason,

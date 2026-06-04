@@ -40,7 +40,7 @@ type Appointment = {
 
 function AdminPage() {
   const router = useRouter();
-  const { session, loading, isAdmin, user } = useAuth();
+  const { session, loading, metaLoading, isAdmin, user } = useAuth();
   const [tab, setTab] = useState<"kyc" | "appointments" | "users">("kyc");
   const [kyc, setKyc] = useState<Kyc[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -180,7 +180,7 @@ function AdminPage() {
   }
 
 
-  if (loading || !session) {
+  if (loading || !session || (metaLoading && !isAdmin)) {
     return (
       <div className="min-h-screen bg-background">
         <SiteHeader />
@@ -192,6 +192,7 @@ function AdminPage() {
       </div>
     );
   }
+
 
   if (!isAdmin) {
     return (
