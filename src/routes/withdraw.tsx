@@ -251,30 +251,8 @@ function WithdrawPage() {
               </span>
             </div>
 
-            {submitted ? (
-              <div className="mt-10 flex items-start gap-4 border border-border bg-secondary p-8">
-                <CheckCircle2 className="mt-0.5 h-7 w-7 shrink-0 text-primary" />
-                <div>
-                  <h2 className="font-display text-2xl text-foreground">
-                    Withdrawal Requested!
-                  </h2>
-                  <p className="mt-2 text-muted-foreground">
-                    Your withdrawal{amount ? ` of $${amount}` : ""} has been
-                    submitted. Funds typically arrive in your US bank account
-                    within 1–3 business days.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSubmitted(false);
-                      setAmount("");
-                    }}
-                    className="mt-5 inline-flex items-center bg-foreground px-6 py-3 font-heading text-sm font-semibold uppercase tracking-wide text-background transition-colors hover:bg-primary"
-                  >
-                    New withdrawal
-                  </button>
-                </div>
-              </div>
+            {submitted && receipt ? (
+              <WithdrawalReceipt receipt={receipt} onReset={resetForm} />
             ) : (
               <form onSubmit={handleSubmit} className="mt-10 max-w-xl space-y-6">
                 {/* Amount */}
