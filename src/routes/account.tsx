@@ -30,7 +30,7 @@ const APPT_STATUS: Record<string, { label: string; cls: string; Icon: typeof Clo
 
 function AccountPage() {
   const router = useRouter();
-  const { session, loading, kycStatus, blocked, balance, user, signOut } = useAuth();
+  const { session, loading, kycStatus, blocked, blockReason, balance, user, signOut } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [apptLoading, setApptLoading] = useState(true);
 
@@ -70,7 +70,7 @@ function AccountPage() {
   }
 
   if (blocked) {
-    return <BlockedNotice />;
+    return <BlockedNotice reason={blockReason} />;
   }
 
   const kycBadge = {
