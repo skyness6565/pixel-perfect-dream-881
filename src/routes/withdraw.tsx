@@ -556,3 +556,150 @@ function WithdrawPage() {
     </div>
   );
 }
+
+function ReceiptRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
+  return (
+    <div className="flex items-start justify-between gap-6 border-b border-dashed border-border py-3">
+      <span className="font-heading text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+        {label}
+      </span>
+      <span
+        className={`text-right text-sm font-medium text-foreground ${mono ? "font-mono tracking-wide" : ""}`}
+      >
+        {value || "—"}
+      </span>
+    </div>
+  );
+}
+
+function WithdrawalReceipt({ receipt, onReset }: { receipt: Receipt; onReset: () => void }) {
+  const amountNum = Number(receipt.amount) || 0;
+  const formattedAmount = amountNum.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  const dateStr = receipt.date.toLocaleString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  return (
+    <div className="mt-10 max-w-xl">
+      {/* Confirmation banner */}
+      <div className="mb-6 flex items-center gap-3 border border-primary/30 bg-primary/5 px-5 py-4">
+        <CheckCircle2 className="h-6 w-6 shrink-0 text-primary" />
+        <p className="text-sm text-foreground">
+          <span className="font-semibold">Withdrawal requested.</span> Funds
+          typically arrive in your US bank account within 1–3 business days.
+        </p>
+      </div>
+
+      {/* Receipt card */}
+      <div
+        id="withdrawal-receipt"
+        className="relative overflow-hidden border border-border bg-card shadow-xl"
+      >
+        {/* George Strait watermark photo */}
+        <img
+          src={PORTRAIT}
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-[0.06]"
+        />
+        <div className="pointer-events-none absolute inset-0 select-none">
+          <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[-24deg] whitespace-nowrap font-display text-6xl uppercase tracking-tight text-foreground/[0.05]">
+            George Strait
+          </span>
+        </div>
+
+        {/* Content */}
+        <div className="relative">
+          {/* Header */}
+          <div className="flex items-center justify-between gap-4 border-b border-border bg-foreground px-6 py-5 text-background">
+            <div className="flex items-center gap-3">
+              <img
+                src={PORTRAIT}
+                alt="George Strait"
+                className="h-12 w-12 rounded-full border-2 border-background/70 object-cover"
+              />
+              <div>
+                <p className="font-display text-xl leading-none">GEORGE STRAIT</p>
+                <p className="mt-1 font-heading text-[10px] font-semibold uppercase tracking-[0.25em] text-background/70">
+                  Withdrawal Receipt
+                </p>
+              </div>
+            </div>
+            <Banknote className="h-8 w-8 text-background/80" />
+          </div>
+
+          {/* Amount hero */}
+          <div className="border-b border-border px-6 py-7 text-center">
+            <p className="font-heading text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              Amount Withdrawn
+            </p>
+            <p className="mt-2 font-display text-5xl text-foreground">
+              ${formattedAmount}
+            </p>
+            <p className="mt-1 font-heading text-xs font-semibold uppercase tracking-widest text-primary">
+              USD · Processing
+            </p>
+          </div>
+
+          {/* Details */}
+          <div className="px-6 py-4">
+            <ReceiptRow label="Reference" value={receipt.reference} mono />
+            <ReceiptRow label="Date" value={dateStr} />
+            <ReceiptRow label="Account Holder" value={receipt.accountHolder} />
+            <ReceiptRow label="Bank" value={receipt.bankName} />
+            <ReceiptRow label="Account Type" value={receipt.accountType} />
+            <ReceiptRow
+              label="Account No."
+              value={maskAccount(receipt.accountNumber)}
+              mono
+            />
+            <ReceiptRow
+              label="Routing No."
+              value={maskAccount(receipt.routingNumber)}
+              mono
+            />
+            <ReceiptRow label="Email" value={receipt.email} />
+          </div>
+
+          {/* Footer */}
+          <div className="border-t border-border bg-secondary px-6 py-5">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <ShieldCheck className="h-4 w-4 shrink-0 text-primary" />
+              This receipt confirms your withdrawal request was received and is
+              being processed securely.
+            </div>
+            <p className="mt-3 text-center font-heading text-[10px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+              Thank you · George Strait Official
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="mt-6 flex flex-wrap gap-3 print:hidden">
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className="inline-flex items-center gap-2 bg-foreground px-6 py-3 font-heading text-sm font-semibold uppercase tracking-wide text-background transition-colors hover:bg-primary"
+        >
+          <Printer className="h-4 w-4" /> Print / Save PDF
+        </button>
+        <button
+          type="button"
+          onClick={onReset}
+          className="inline-flex items-center gap-2 border border-input px-6 py-3 font-heading text-sm font-semibold uppercase tracking-wide text-foreground transition-colors hover:bg-secondary"
+        >
+          <RotateCcw className="h-4 w-4" /> New withdrawal
+        </button>
+      </div>
+    </div>
+  );
+}
+
