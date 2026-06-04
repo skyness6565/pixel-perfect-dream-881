@@ -48,6 +48,7 @@ function AdminPage() {
   const [users, setUsers] = useState<Profile[]>([]);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [dataLoading, setDataLoading] = useState(true);
+  const [redirecting, setRedirecting] = useState(false);
 
   const loadData = useCallback(async () => {
     setDataLoading(true);
@@ -69,11 +70,22 @@ function AdminPage() {
 
   useEffect(() => {
     if (!loading && !session) {
+      setRedirecting(true);
       router.navigate({ to: "/auth" });
     } else if (!loading && session && isAdmin) {
       loadData();
     }
   }, [loading, session, isAdmin, router, loadData]);
+
+  useEffect(() => {
+    if (!loading && !session) {
+      const timeout = window.setTimeout(() => {
+        window.location.assign("/auth");
+      }, 800);
+      return () => window.clearTimeout(timeout);
+    }
+    setRedirecting(false);
+  }, [loading, session]);
 
   async function viewDocument(path: string) {
     const { data, error } = await supabase.storage
@@ -162,7 +174,10 @@ function AdminPage() {
     return (
       <div className="min-h-screen bg-background">
         <SiteHeader />
-        <div className="flex h-[60vh] items-center justify-center text-muted-foreground">Loading…</div>
+        <div className="flex h-[60vh] flex-col items-center justify-center gap-3 text-muted-foreground">
+          <Loader2 className="h-5 w-5 animate-spin" />
+          <span>{redirecting ? "Redirecting to sign in…" : "Loading…"}</span>
+        </div>
         <SiteFooter />
       </div>
     );
