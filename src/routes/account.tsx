@@ -134,17 +134,17 @@ function AccountPage() {
           </div>
 
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <Link to="/book-appointment" className="group border border-border bg-secondary p-6 transition-colors hover:border-primary">
+            <Link to="/book-appointment" preload="render" className="group border border-border bg-secondary p-6 transition-colors hover:border-primary">
               <CalendarDays className="h-8 w-8 text-primary" />
               <h2 className="mt-4 font-heading text-lg font-bold text-foreground">Book Appointment</h2>
               <p className="mt-1 text-sm text-muted-foreground">Schedule a meeting and pick a time.</p>
             </Link>
-            <Link to="/kyc" className="group border border-border bg-secondary p-6 transition-colors hover:border-primary">
+            <Link to="/kyc" preload="render" className="group border border-border bg-secondary p-6 transition-colors hover:border-primary">
               <ShieldCheck className="h-8 w-8 text-primary" />
               <h2 className="mt-4 font-heading text-lg font-bold text-foreground">Identity Verification</h2>
               <p className="mt-1 text-sm text-muted-foreground">Submit your ID to unlock withdrawals.</p>
             </Link>
-            <Link to="/withdraw" className="group border border-border bg-secondary p-6 transition-colors hover:border-primary">
+            <Link to="/withdraw" preload="render" className="group border border-border bg-secondary p-6 transition-colors hover:border-primary">
               <Banknote className="h-8 w-8 text-primary" />
               <h2 className="mt-4 font-heading text-lg font-bold text-foreground">Withdraw Funds</h2>
               <p className="mt-1 text-sm text-muted-foreground">
