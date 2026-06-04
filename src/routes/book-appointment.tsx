@@ -93,6 +93,12 @@ function BookAppointmentPage() {
     );
   }
 
+  if (blocked) {
+    return <BlockedNotice reason={blockReason} />;
+  }
+
+
+
   const inputCls =
     "mt-2 w-full border border-input bg-background px-4 py-3 text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary";
   const labelCls = "block font-heading text-base font-semibold text-foreground";
