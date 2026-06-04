@@ -113,6 +113,7 @@ function WithdrawPage() {
   const { session, loading, kycStatus, blocked, blockReason } = useAuth();
   const [submitted, setSubmitted] = useState(false);
   const [amount, setAmount] = useState("");
+  const [receipt, setReceipt] = useState<Receipt | null>(null);
 
   useEffect(() => {
     if (!loading && !session) router.navigate({ to: "/auth" });
@@ -120,11 +121,32 @@ function WithdrawPage() {
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    const get = (name: string) => String(data.get(name) ?? "").trim();
+    setReceipt({
+      reference: genReference(),
+      date: new Date(),
+      amount: get("amount") || amount,
+      accountHolder: get("accountHolder"),
+      bankName: get("bankName"),
+      accountType: get("accountType"),
+      accountNumber: get("accountNumber"),
+      routingNumber: get("routingNumber"),
+      email: get("email"),
+    });
     setSubmitted(true);
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }
+
+  function resetForm() {
+    setSubmitted(false);
+    setReceipt(null);
+    setAmount("");
+  }
+
 
   if (loading || !session) {
     return (
