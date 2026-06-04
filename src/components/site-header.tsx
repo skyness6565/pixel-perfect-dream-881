@@ -32,6 +32,7 @@ export function SiteHeader() {
             <Link
               key={item.label}
               to={item.to}
+              preload="intent"
               className="relative font-heading text-sm font-medium uppercase tracking-wide text-white/85 transition-colors hover:text-primary"
               activeProps={{ className: "text-white" }}
               activeOptions={{ exact: true }}
