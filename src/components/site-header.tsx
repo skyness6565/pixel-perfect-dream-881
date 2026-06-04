@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { Menu, X, LogOut, User } from "lucide-react";
+import { Link, useRouter } from "@tanstack/react-router";
+import { useAuth } from "@/lib/auth";
 
 const NAV_ITEMS: { label: string; to: string }[] = [
   { label: "Home", to: "/" },
