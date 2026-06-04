@@ -14,6 +14,7 @@ type AuthContextValue = {
   loading: boolean;
   isAdmin: boolean;
   blocked: boolean;
+  blockReason: string | null;
   balance: number;
   kycStatus: "none" | "pending" | "approved" | "rejected";
   refresh: () => Promise<void>;
