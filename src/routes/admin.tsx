@@ -15,7 +15,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-type Profile = { id: string; email: string | null; full_name: string | null; balance: number; blocked: boolean };
+type Profile = { id: string; email: string | null; full_name: string | null; balance: number; blocked: boolean; block_reason: string | null };
 type Kyc = {
   id: string;
   user_id: string;
