@@ -156,19 +156,29 @@ function AdminPage() {
 
   async function toggleBlock(u: Profile) {
     const next = !u.blocked;
+    let reason: string | null = null;
+    if (next) {
+      const input = window.prompt(
+        `Block ${u.full_name || u.email || "this user"}?\nEnter a reason — the user will see this message when they log in:`,
+        "",
+      );
+      if (input === null) return;
+      reason = input.trim() || "No reason provided.";
+    }
     setBusyId(u.id);
     const { error } = await supabase
       .from("profiles")
-      .update({ blocked: next })
+      .update({ blocked: next, block_reason: reason })
       .eq("id", u.id);
     if (error) {
       toast.error(error.message);
     } else {
       toast.success(next ? "Account blocked" : "Account unblocked");
-      setUsers((prev) => prev.map((p) => (p.id === u.id ? { ...p, blocked: next } : p)));
+      setUsers((prev) => prev.map((p) => (p.id === u.id ? { ...p, blocked: next, block_reason: reason } : p)));
     }
     setBusyId(null);
   }
+
 
   if (loading || !session) {
     return (
