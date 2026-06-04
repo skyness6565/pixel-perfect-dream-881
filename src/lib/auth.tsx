@@ -117,6 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setBlocked(false);
     setBlockReason(null);
     setBalance(0);
+    setMetaLoading(false);
   }
 
   return (
@@ -125,6 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         session,
         user: session?.user ?? null,
         loading,
+        metaLoading,
         isAdmin,
         blocked,
         blockReason,
