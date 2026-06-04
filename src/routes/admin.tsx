@@ -366,6 +366,9 @@ function AdminPage() {
                           </span>
                         )}
                       </div>
+                      {u.blocked && u.block_reason && (
+                        <p className="mt-1 text-xs text-red-600"><span className="font-semibold">Reason:</span> {u.block_reason}</p>
+                      )}
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
