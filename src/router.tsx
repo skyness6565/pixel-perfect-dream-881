@@ -9,7 +9,11 @@ export const getRouter = () => {
     routeTree,
     context: { queryClient },
     scrollRestoration: true,
+    // Preload route chunks/data on hover & touch so clicks feel instant.
+    defaultPreload: "intent",
     defaultPreloadStaleTime: 0,
+    // Render the destination immediately instead of holding on the old page.
+    defaultPendingMs: 0,
   });
 
   return router;
