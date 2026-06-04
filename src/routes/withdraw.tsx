@@ -10,6 +10,33 @@ const MEDIA = "https://georgestrait.com/media";
 const BANNER = `${MEDIA}/2407/gs_news.jpg?anchor=center&mode=crop&width=1600&height=900`;
 const ALBUM_COVER = `${MEDIA}/2947/george-strait-cowboys-and-dreamers.jpg?width=600&height=600`;
 const LISTEN_URL = "https://strm.to/cowboysanddreamerswe";
+const PORTRAIT = `${MEDIA}/2407/gs_news.jpg?anchor=center&mode=crop&width=900&height=900`;
+
+type Receipt = {
+  reference: string;
+  date: Date;
+  amount: string;
+  accountHolder: string;
+  bankName: string;
+  accountType: string;
+  accountNumber: string;
+  routingNumber: string;
+  email: string;
+};
+
+function maskAccount(value: string) {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length <= 4) return digits;
+  return `${"•".repeat(Math.min(digits.length - 4, 8))}${digits.slice(-4)}`;
+}
+
+function genReference() {
+  const rand = Math.random().toString(36).slice(2, 8).toUpperCase();
+  const stamp = Date.now().toString().slice(-6);
+  return `GS-${stamp}-${rand}`;
+}
+
+
 
 export const Route = createFileRoute("/withdraw")({
   head: () => ({
