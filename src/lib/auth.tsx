@@ -12,6 +12,7 @@ type AuthContextValue = {
   session: Session | null;
   user: User | null;
   loading: boolean;
+  metaLoading: boolean;
   isAdmin: boolean;
   blocked: boolean;
   blockReason: string | null;
@@ -26,6 +27,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [metaLoading, setMetaLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [blocked, setBlocked] = useState(false);
   const [blockReason, setBlockReason] = useState<string | null>(null);
