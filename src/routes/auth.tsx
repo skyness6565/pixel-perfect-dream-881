@@ -49,13 +49,16 @@ function AuthPage() {
   const [secret, setSecret] = useState<string | null>(null);
   const [code, setCode] = useState("");
   const [copied, setCopied] = useState(false);
+  // True while we're transitioning a fresh signup into the 2FA enrollment
+  // screen. Blocks the auto-redirect from firing before the QR appears.
+  const [enrolling, setEnrolling] = useState(false);
 
   useEffect(() => {
     // Only auto-redirect when we're not in the middle of a 2FA flow.
-    if (!loading && session && step === "credentials") {
+    if (!loading && session && step === "credentials" && !enrolling) {
       router.navigate({ to: "/account" });
     }
-  }, [loading, session, router, step]);
+  }, [loading, session, router, step, enrolling]);
 
   function resetMfa() {
     setFactorId(null);
@@ -103,6 +106,9 @@ function AuthPage() {
     setBusy(true);
     try {
       if (mode === "signup") {
+        // Block the auto-redirect: signUp triggers SIGNED_IN, and we must
+        // stay on this page to show the 2FA enrollment screen.
+        setEnrolling(true);
         const { data, error } = await supabase.auth.signUp({
           email: parsed.data.email,
           password: parsed.data.password,
@@ -111,8 +117,12 @@ function AuthPage() {
             data: { full_name: fullName.trim() },
           },
         });
-        if (error) throw error;
+        if (error) {
+          setEnrolling(false);
+          throw error;
+        }
         if (!data.session) {
+          setEnrolling(false);
           toast.success(
             "Account created! Check your email to confirm, then sign in to set up 2FA.",
           );
@@ -149,6 +159,7 @@ function AuthPage() {
     } catch (err) {
       const message = err instanceof Error ? err.message : "Something went wrong";
       toast.error(message);
+      setEnrolling(false);
     } finally {
       setBusy(false);
     }
