@@ -30,13 +30,18 @@ const APPT_STATUS: Record<string, { label: string; cls: string; Icon: typeof Clo
 
 function AccountPage() {
   const router = useRouter();
-  const { session, loading, kycStatus, blocked, blockReason, balance, user, signOut } = useAuth();
+  const { session, loading, kycStatus, blocked, blockReason, balance, user, signOut, mfaChecked, mfaSatisfied } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [apptLoading, setApptLoading] = useState(true);
 
   useEffect(() => {
-    if (!loading && !session) router.navigate({ to: "/auth" });
-  }, [loading, session, router]);
+    if (loading) return;
+    // No session, or 2FA not completed for this session -> back to /auth,
+    // which forces enrollment/verification.
+    if (!session || (mfaChecked && !mfaSatisfied)) {
+      router.navigate({ to: "/auth" });
+    }
+  }, [loading, session, mfaChecked, mfaSatisfied, router]);
 
   useEffect(() => {
     if (!session || !user) return;
