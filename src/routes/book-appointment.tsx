@@ -51,8 +51,11 @@ function BookAppointmentPage() {
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
-    if (!loading && !session) router.navigate({ to: "/auth" });
-  }, [loading, session, router]);
+    if (loading) return;
+    if (!session || (mfaChecked && !mfaSatisfied)) {
+      router.navigate({ to: "/auth" });
+    }
+  }, [loading, session, mfaChecked, mfaSatisfied, router]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
