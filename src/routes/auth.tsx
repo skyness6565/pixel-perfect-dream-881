@@ -138,23 +138,27 @@ function AuthPage() {
         });
         if (error) throw error;
 
-        // Does this account require a second factor?
-        const { data: aal } =
-          await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-        if (aal?.nextLevel === "aal2" && aal.nextLevel !== aal.currentLevel) {
-          const { data: factors } = await supabase.auth.mfa.listFactors();
-          const totp = factors?.totp?.[0];
-          if (totp) {
-            setFactorId(totp.id);
-            setCode("");
-            setStep("mfa-challenge");
-            toast.message("Enter the code from your authenticator app.");
-            return;
-          }
+        // Check this account's existing factors.
+        const { data: factors } = await supabase.auth.mfa.listFactors();
+        const verifiedTotp = (factors?.totp ?? []).find(
+          (f) => f.status === "verified",
+        );
+
+        if (verifiedTotp) {
+          // 2FA already enabled — challenge for the current code.
+          setFactorId(verifiedTotp.id);
+          setCode("");
+          setStep("mfa-challenge");
+          toast.message("Enter the code from your authenticator app.");
+          return;
         }
-        toast.success("Welcome back!");
-        await refresh();
-        router.navigate({ to: "/account" });
+
+        // No verified 2FA (account created before 2FA was enforced).
+        // Force enrollment now before letting them into the account.
+        setEnrolling(true);
+        toast.message("Set up two-factor authentication to secure your account.");
+        await startEnrollment();
+        return;
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Something went wrong";
