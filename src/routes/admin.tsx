@@ -40,7 +40,7 @@ type Appointment = {
 
 function AdminPage() {
   const router = useRouter();
-  const { session, loading, metaLoading, isAdmin, user } = useAuth();
+  const { session, loading, metaLoading, isAdmin, user, mfaChecked, mfaSatisfied } = useAuth();
   const [tab, setTab] = useState<"kyc" | "appointments" | "users">("kyc");
   const [kyc, setKyc] = useState<Kyc[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
