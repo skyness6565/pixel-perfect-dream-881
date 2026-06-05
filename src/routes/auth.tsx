@@ -207,6 +207,7 @@ function AuthPage() {
           : "Verified — welcome back!",
       );
       resetMfa();
+      setEnrolling(false);
       setStep("credentials");
       await refresh();
       router.navigate({ to: "/account" });
