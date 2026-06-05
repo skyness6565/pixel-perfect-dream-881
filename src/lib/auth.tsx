@@ -103,7 +103,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function refresh() {
     const { data } = await supabase.auth.getSession();
     setSession(data.session);
-    await loadUserMeta(data.session?.user?.id);
+    await Promise.all([
+      loadUserMeta(data.session?.user?.id),
+      checkMfa(!!data.session),
+    ]);
   }
 
   useEffect(() => {
@@ -116,6 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // (roles, balance, blocked status) loads in the background.
       setLoading(false);
       loadUserMeta(data.session?.user?.id);
+      checkMfa(!!data.session);
     });
 
     const {
@@ -124,7 +128,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(newSession);
       setLoading(false);
       // defer supabase calls out of the callback
-      setTimeout(() => loadUserMeta(newSession?.user?.id), 0);
+      setTimeout(() => {
+        loadUserMeta(newSession?.user?.id);
+        checkMfa(!!newSession);
+      }, 0);
     });
 
     return () => {
@@ -143,6 +150,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setBlockReason(null);
     setBalance(0);
     setMetaLoading(false);
+    setMfaSatisfied(false);
+    setMfaChecked(true);
   }
 
   return (
@@ -157,6 +166,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         blockReason,
         balance,
         kycStatus,
+        mfaChecked,
+        mfaSatisfied,
         refresh,
         signOut,
       }}
