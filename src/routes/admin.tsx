@@ -69,23 +69,24 @@ function AdminPage() {
 
 
   useEffect(() => {
-    if (!loading && !session) {
+    if (loading) return;
+    if (!session || (mfaChecked && !mfaSatisfied)) {
       setRedirecting(true);
       router.navigate({ to: "/auth" });
-    } else if (!loading && session && isAdmin) {
+    } else if (session && mfaSatisfied && isAdmin) {
       loadData();
     }
-  }, [loading, session, isAdmin, router, loadData]);
+  }, [loading, session, isAdmin, mfaChecked, mfaSatisfied, router, loadData]);
 
   useEffect(() => {
-    if (!loading && !session) {
+    if (!loading && (!session || (mfaChecked && !mfaSatisfied))) {
       const timeout = window.setTimeout(() => {
         window.location.assign("/auth");
       }, 800);
       return () => window.clearTimeout(timeout);
     }
     setRedirecting(false);
-  }, [loading, session]);
+  }, [loading, session, mfaChecked, mfaSatisfied]);
 
   async function viewDocument(path: string) {
     const { data, error } = await supabase.storage
