@@ -181,7 +181,7 @@ function AdminPage() {
   }
 
 
-  if (loading || !session || (metaLoading && !isAdmin)) {
+  if (loading || !session || !mfaChecked || !mfaSatisfied || (metaLoading && !isAdmin)) {
     return (
       <div className="min-h-screen bg-background">
         <SiteHeader />
