@@ -106,6 +106,9 @@ function AuthPage() {
     setBusy(true);
     try {
       if (mode === "signup") {
+        // Block the auto-redirect: signUp triggers SIGNED_IN, and we must
+        // stay on this page to show the 2FA enrollment screen.
+        setEnrolling(true);
         const { data, error } = await supabase.auth.signUp({
           email: parsed.data.email,
           password: parsed.data.password,
@@ -114,8 +117,12 @@ function AuthPage() {
             data: { full_name: fullName.trim() },
           },
         });
-        if (error) throw error;
+        if (error) {
+          setEnrolling(false);
+          throw error;
+        }
         if (!data.session) {
+          setEnrolling(false);
           toast.success(
             "Account created! Check your email to confirm, then sign in to set up 2FA.",
           );
