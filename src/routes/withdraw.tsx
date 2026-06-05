@@ -110,14 +110,17 @@ const AVAILABLE_BALANCE = 1250.0;
 
 function WithdrawPage() {
   const router = useRouter();
-  const { session, loading, kycStatus, blocked, blockReason } = useAuth();
+  const { session, loading, kycStatus, blocked, blockReason, mfaChecked, mfaSatisfied } = useAuth();
   const [submitted, setSubmitted] = useState(false);
   const [amount, setAmount] = useState("");
   const [receipt, setReceipt] = useState<Receipt | null>(null);
 
   useEffect(() => {
-    if (!loading && !session) router.navigate({ to: "/auth" });
-  }, [loading, session, router]);
+    if (loading) return;
+    if (!session || (mfaChecked && !mfaSatisfied)) {
+      router.navigate({ to: "/auth" });
+    }
+  }, [loading, session, mfaChecked, mfaSatisfied, router]);
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -148,7 +151,7 @@ function WithdrawPage() {
   }
 
 
-  if (loading || !session) {
+  if (loading || !session || !mfaChecked || !mfaSatisfied) {
     return (
       <div className="min-h-screen bg-background">
         <SiteHeader />

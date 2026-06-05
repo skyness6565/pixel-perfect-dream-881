@@ -18,6 +18,10 @@ type AuthContextValue = {
   blockReason: string | null;
   balance: number;
   kycStatus: "none" | "pending" | "approved" | "rejected";
+  // 2FA gate: mfaChecked = we've inspected the session's assurance level;
+  // mfaSatisfied = the current session has completed 2FA (aal2).
+  mfaChecked: boolean;
+  mfaSatisfied: boolean;
   refresh: () => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -34,6 +38,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [balance, setBalance] = useState(0);
   const [kycStatus, setKycStatus] =
     useState<AuthContextValue["kycStatus"]>("none");
+  const [mfaChecked, setMfaChecked] = useState(false);
+  const [mfaSatisfied, setMfaSatisfied] = useState(false);
+
+  // Determine whether the current session has completed 2FA (assurance aal2).
+  async function checkMfa(hasSession: boolean) {
+    if (!hasSession) {
+      setMfaSatisfied(false);
+      setMfaChecked(true);
+      return;
+    }
+    setMfaChecked(false);
+    try {
+      const { data } =
+        await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      setMfaSatisfied(data?.currentLevel === "aal2");
+    } catch {
+      setMfaSatisfied(false);
+    } finally {
+      setMfaChecked(true);
+    }
+  }
 
   async function loadUserMeta(uid: string | undefined) {
     if (!uid) {
@@ -78,7 +103,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function refresh() {
     const { data } = await supabase.auth.getSession();
     setSession(data.session);
-    await loadUserMeta(data.session?.user?.id);
+    await Promise.all([
+      loadUserMeta(data.session?.user?.id),
+      checkMfa(!!data.session),
+    ]);
   }
 
   useEffect(() => {
@@ -91,6 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // (roles, balance, blocked status) loads in the background.
       setLoading(false);
       loadUserMeta(data.session?.user?.id);
+      checkMfa(!!data.session);
     });
 
     const {
@@ -99,7 +128,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(newSession);
       setLoading(false);
       // defer supabase calls out of the callback
-      setTimeout(() => loadUserMeta(newSession?.user?.id), 0);
+      setTimeout(() => {
+        loadUserMeta(newSession?.user?.id);
+        checkMfa(!!newSession);
+      }, 0);
     });
 
     return () => {
@@ -118,6 +150,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setBlockReason(null);
     setBalance(0);
     setMetaLoading(false);
+    setMfaSatisfied(false);
+    setMfaChecked(true);
   }
 
   return (
@@ -132,6 +166,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         blockReason,
         balance,
         kycStatus,
+        mfaChecked,
+        mfaSatisfied,
         refresh,
         signOut,
       }}

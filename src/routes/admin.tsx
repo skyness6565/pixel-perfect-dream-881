@@ -40,7 +40,7 @@ type Appointment = {
 
 function AdminPage() {
   const router = useRouter();
-  const { session, loading, metaLoading, isAdmin, user } = useAuth();
+  const { session, loading, metaLoading, isAdmin, user, mfaChecked, mfaSatisfied } = useAuth();
   const [tab, setTab] = useState<"kyc" | "appointments" | "users">("kyc");
   const [kyc, setKyc] = useState<Kyc[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -69,23 +69,24 @@ function AdminPage() {
 
 
   useEffect(() => {
-    if (!loading && !session) {
+    if (loading) return;
+    if (!session || (mfaChecked && !mfaSatisfied)) {
       setRedirecting(true);
       router.navigate({ to: "/auth" });
-    } else if (!loading && session && isAdmin) {
+    } else if (session && mfaSatisfied && isAdmin) {
       loadData();
     }
-  }, [loading, session, isAdmin, router, loadData]);
+  }, [loading, session, isAdmin, mfaChecked, mfaSatisfied, router, loadData]);
 
   useEffect(() => {
-    if (!loading && !session) {
+    if (!loading && (!session || (mfaChecked && !mfaSatisfied))) {
       const timeout = window.setTimeout(() => {
         window.location.assign("/auth");
       }, 800);
       return () => window.clearTimeout(timeout);
     }
     setRedirecting(false);
-  }, [loading, session]);
+  }, [loading, session, mfaChecked, mfaSatisfied]);
 
   async function viewDocument(path: string) {
     const { data, error } = await supabase.storage
@@ -180,7 +181,7 @@ function AdminPage() {
   }
 
 
-  if (loading || !session || (metaLoading && !isAdmin)) {
+  if (loading || !session || !mfaChecked || !mfaSatisfied || (metaLoading && !isAdmin)) {
     return (
       <div className="min-h-screen bg-background">
         <SiteHeader />

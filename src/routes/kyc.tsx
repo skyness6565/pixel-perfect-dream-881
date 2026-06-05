@@ -14,7 +14,7 @@ export const Route = createFileRoute("/kyc")({
 
 function KycPage() {
   const router = useRouter();
-  const { session, loading, kycStatus, user, refresh } = useAuth();
+  const { session, loading, kycStatus, user, refresh, mfaChecked, mfaSatisfied } = useAuth();
   const [front, setFront] = useState<File | null>(null);
   const [back, setBack] = useState<File | null>(null);
   const [frontPreview, setFrontPreview] = useState<string | null>(null);
@@ -22,8 +22,11 @@ function KycPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!loading && !session) router.navigate({ to: "/auth" });
-  }, [loading, session, router]);
+    if (loading) return;
+    if (!session || (mfaChecked && !mfaSatisfied)) {
+      router.navigate({ to: "/auth" });
+    }
+  }, [loading, session, mfaChecked, mfaSatisfied, router]);
 
   // Build & clean up object-URL previews
   useEffect(() => {
@@ -95,7 +98,7 @@ function KycPage() {
     }
   }
 
-  if (loading || !session) {
+  if (loading || !session || !mfaChecked || !mfaSatisfied) {
     return (
       <div className="min-h-screen bg-background">
         <SiteHeader />

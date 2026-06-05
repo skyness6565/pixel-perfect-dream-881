@@ -38,7 +38,7 @@ const TIME_SLOTS = [
 
 function BookAppointmentPage() {
   const router = useRouter();
-  const { session, loading, blocked, blockReason, user } = useAuth();
+  const { session, loading, blocked, blockReason, user, mfaChecked, mfaSatisfied } = useAuth();
   const [busy, setBusy] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -51,8 +51,11 @@ function BookAppointmentPage() {
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
-    if (!loading && !session) router.navigate({ to: "/auth" });
-  }, [loading, session, router]);
+    if (loading) return;
+    if (!session || (mfaChecked && !mfaSatisfied)) {
+      router.navigate({ to: "/auth" });
+    }
+  }, [loading, session, mfaChecked, mfaSatisfied, router]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -83,7 +86,7 @@ function BookAppointmentPage() {
     }
   }
 
-  if (loading || !session) {
+  if (loading || !session || !mfaChecked || !mfaSatisfied) {
     return (
       <div className="min-h-screen bg-background">
         <SiteHeader />
