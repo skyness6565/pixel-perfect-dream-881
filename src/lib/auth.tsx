@@ -18,6 +18,10 @@ type AuthContextValue = {
   blockReason: string | null;
   balance: number;
   kycStatus: "none" | "pending" | "approved" | "rejected";
+  // 2FA gate: mfaChecked = we've inspected the session's assurance level;
+  // mfaSatisfied = the current session has completed 2FA (aal2).
+  mfaChecked: boolean;
+  mfaSatisfied: boolean;
   refresh: () => Promise<void>;
   signOut: () => Promise<void>;
 };
