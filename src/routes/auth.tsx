@@ -35,7 +35,7 @@ type Step = "credentials" | "mfa-enroll" | "mfa-challenge";
 
 function AuthPage() {
   const router = useRouter();
-  const { session, loading, refresh } = useAuth();
+  const { session, loading, refresh, mfaChecked, mfaSatisfied } = useAuth();
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [step, setStep] = useState<Step>("credentials");
   const [fullName, setFullName] = useState("");
@@ -54,11 +54,43 @@ function AuthPage() {
   const [enrolling, setEnrolling] = useState(false);
 
   useEffect(() => {
-    // Only auto-redirect when we're not in the middle of a 2FA flow.
-    if (!loading && session && step === "credentials" && !enrolling) {
+    // Decide where a signed-in user goes based on their 2FA status.
+    if (loading || enrolling || busy) return;
+    if (!session || step !== "credentials" || !mfaChecked) return;
+
+    if (mfaSatisfied) {
+      // 2FA already completed this session — proceed to the account.
       router.navigate({ to: "/account" });
+      return;
     }
-  }, [loading, session, router, step, enrolling]);
+
+    // Signed in but 2FA not completed: force enrollment or a challenge
+    // before any account/dashboard page can load.
+    let cancelled = false;
+    setEnrolling(true);
+    (async () => {
+      const { data: factors } = await supabase.auth.mfa.listFactors();
+      if (cancelled) return;
+      const verified = (factors?.totp ?? []).find(
+        (f) => f.status === "verified",
+      );
+      if (verified) {
+        setFactorId(verified.id);
+        setCode("");
+        setStep("mfa-challenge");
+        toast.message("Enter the code from your authenticator app.");
+      } else {
+        toast.message(
+          "Set up two-factor authentication to secure your account.",
+        );
+        await startEnrollment();
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [loading, session, step, enrolling, busy, mfaChecked, mfaSatisfied, router]);
+
 
   function resetMfa() {
     setFactorId(null);
