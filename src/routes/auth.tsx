@@ -159,6 +159,7 @@ function AuthPage() {
     } catch (err) {
       const message = err instanceof Error ? err.message : "Something went wrong";
       toast.error(message);
+      setEnrolling(false);
     } finally {
       setBusy(false);
     }
