@@ -10,13 +10,15 @@ const NAV_ITEMS: { label: string; to: string }[] = [
   { label: "Store", to: "/store" },
   { label: "Fan Club", to: "/fan-club" },
   { label: "Book", to: "/book-appointment" },
-  { label: "Withdraw", to: "/withdraw" },
-  { label: "Account", to: "/account" },
   { label: "Shows", to: "/" },
 ];
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const { session, signOut } = useAuth();
+  const router = useRouter();
+
+  const isAuth = !!session;
 
   return (
     <header className="absolute inset-x-0 top-0 z-50 bg-gradient-to-b from-black/70 to-transparent">
@@ -41,6 +43,39 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
+
+          {isAuth ? (
+            <>
+              <Link
+                to="/account"
+                preload="intent"
+                className="relative font-heading text-sm font-medium uppercase tracking-wide text-white/85 transition-colors hover:text-primary"
+                activeProps={{ className: "text-white" }}
+              >
+                <span className="inline-flex items-center gap-1.5">
+                  <User className="h-4 w-4" /> Account
+                </span>
+              </Link>
+              <button
+                onClick={async () => {
+                  await signOut();
+                  router.navigate({ to: "/auth" });
+                }}
+                className="relative inline-flex items-center gap-1.5 font-heading text-sm font-medium uppercase tracking-wide text-white/85 transition-colors hover:text-primary"
+              >
+                <LogOut className="h-4 w-4" /> Log out
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/auth"
+              preload="intent"
+              className="relative font-heading text-sm font-medium uppercase tracking-wide text-white/85 transition-colors hover:text-primary"
+              activeProps={{ className: "text-white" }}
+            >
+              Sign in
+            </Link>
+          )}
         </nav>
 
         <button
@@ -64,6 +99,40 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
+
+          {isAuth ? (
+            <>
+              <Link
+                to="/account"
+                className="block py-3 font-heading text-sm font-medium uppercase tracking-wide text-foreground/85 hover:text-primary"
+                onClick={() => setOpen(false)}
+              >
+                <span className="inline-flex items-center gap-1.5">
+                  <User className="h-4 w-4" /> Account
+                </span>
+              </Link>
+              <button
+                onClick={async () => {
+                  setOpen(false);
+                  await signOut();
+                  router.navigate({ to: "/auth" });
+                }}
+                className="block w-full py-3 text-left font-heading text-sm font-medium uppercase tracking-wide text-foreground/85 hover:text-primary"
+              >
+                <span className="inline-flex items-center gap-1.5">
+                  <LogOut className="h-4 w-4" /> Log out
+                </span>
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/auth"
+              className="block py-3 font-heading text-sm font-medium uppercase tracking-wide text-foreground/85 hover:text-primary"
+              onClick={() => setOpen(false)}
+            >
+              Sign in
+            </Link>
+          )}
         </nav>
       )}
     </header>
