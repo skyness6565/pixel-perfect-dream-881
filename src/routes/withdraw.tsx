@@ -151,7 +151,7 @@ function WithdrawPage() {
   }
 
 
-  if (loading || !session) {
+  if (loading || !session || !mfaChecked || !mfaSatisfied) {
     return (
       <div className="min-h-screen bg-background">
         <SiteHeader />
