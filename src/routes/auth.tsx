@@ -49,13 +49,16 @@ function AuthPage() {
   const [secret, setSecret] = useState<string | null>(null);
   const [code, setCode] = useState("");
   const [copied, setCopied] = useState(false);
+  // True while we're transitioning a fresh signup into the 2FA enrollment
+  // screen. Blocks the auto-redirect from firing before the QR appears.
+  const [enrolling, setEnrolling] = useState(false);
 
   useEffect(() => {
     // Only auto-redirect when we're not in the middle of a 2FA flow.
-    if (!loading && session && step === "credentials") {
+    if (!loading && session && step === "credentials" && !enrolling) {
       router.navigate({ to: "/account" });
     }
-  }, [loading, session, router, step]);
+  }, [loading, session, router, step, enrolling]);
 
   function resetMfa() {
     setFactorId(null);
