@@ -38,7 +38,7 @@ const TIME_SLOTS = [
 
 function BookAppointmentPage() {
   const router = useRouter();
-  const { session, loading, blocked, blockReason, user } = useAuth();
+  const { session, loading, blocked, blockReason, user, mfaChecked, mfaSatisfied } = useAuth();
   const [busy, setBusy] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
