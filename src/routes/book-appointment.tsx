@@ -119,7 +119,7 @@ function BookAppointmentPage() {
         <div className="mx-auto max-w-2xl px-6">
           <div className="flex items-center gap-3">
             <CalendarDays className="h-9 w-9 text-primary" />
-            <h1 className="font-display text-5xl text-foreground md:text-6xl">BOOK APPOINTMENT</h1>
+            <h1 className="font-display text-3xl text-foreground sm:text-5xl md:text-6xl">BOOK APPOINTMENT</h1>
           </div>
 
           {submitted ? (
