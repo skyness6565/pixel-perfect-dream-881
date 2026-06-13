@@ -38,27 +38,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [balance, setBalance] = useState(0);
   const [kycStatus, setKycStatus] =
     useState<AuthContextValue["kycStatus"]>("none");
-  const [mfaChecked, setMfaChecked] = useState(false);
-  const [mfaSatisfied, setMfaSatisfied] = useState(false);
-
-  // Determine whether the current session has completed 2FA (assurance aal2).
-  async function checkMfa(hasSession: boolean) {
-    if (!hasSession) {
-      setMfaSatisfied(false);
-      setMfaChecked(true);
-      return;
-    }
-    setMfaChecked(false);
-    try {
-      const { data } =
-        await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-      setMfaSatisfied(data?.currentLevel === "aal2");
-    } catch {
-      setMfaSatisfied(false);
-    } finally {
-      setMfaChecked(true);
-    }
-  }
+  // 2FA has been removed. These remain `true` so any existing route guards
+  // that reference them simply allow access once the user is signed in.
+  const mfaChecked = true;
+  const mfaSatisfied = true;
 
   async function loadUserMeta(uid: string | undefined) {
     if (!uid) {
