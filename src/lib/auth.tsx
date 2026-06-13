@@ -128,8 +128,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setBlockReason(null);
     setBalance(0);
     setMetaLoading(false);
-    setMfaSatisfied(false);
-    setMfaChecked(true);
   }
 
   return (
