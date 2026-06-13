@@ -248,7 +248,7 @@ function AdminPage() {
           </div>
 
           {/* Tabs */}
-          <div className="mt-8 flex gap-2 border-b border-border">
+          <div className="mt-8 flex gap-2 overflow-x-auto border-b border-border">
             {([
               { key: "kyc", label: `KYC Submissions (${kyc.length})` },
               { key: "appointments", label: `Appointments (${appointments.length})` },
@@ -257,7 +257,7 @@ function AdminPage() {
               <button
                 key={t.key}
                 onClick={() => setTab(t.key)}
-                className={`px-5 py-3 font-heading text-sm font-semibold uppercase tracking-wide transition-colors ${
+                className={`shrink-0 whitespace-nowrap px-3 py-3 font-heading text-xs font-semibold uppercase tracking-wide transition-colors sm:px-5 sm:text-sm ${
                   tab === t.key
                     ? "border-b-2 border-primary text-foreground"
                     : "text-muted-foreground hover:text-foreground"
