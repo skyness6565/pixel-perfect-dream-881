@@ -12,4 +12,10 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Force the Nitro server build on and pin the Vercel preset for self-deploys.
+  // Inside a Lovable build this is ignored (Cloudflare is forced), so the
+  // Lovable preview/publish flow is unaffected. On Vercel, this makes the build
+  // emit the serverless SSR output (.vercel/output) instead of a static site,
+  // which is what fixes the 404: NOT_FOUND.
+  nitro: { preset: "vercel" },
 });
