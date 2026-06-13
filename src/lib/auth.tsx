@@ -38,27 +38,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [balance, setBalance] = useState(0);
   const [kycStatus, setKycStatus] =
     useState<AuthContextValue["kycStatus"]>("none");
-  const [mfaChecked, setMfaChecked] = useState(false);
-  const [mfaSatisfied, setMfaSatisfied] = useState(false);
-
-  // Determine whether the current session has completed 2FA (assurance aal2).
-  async function checkMfa(hasSession: boolean) {
-    if (!hasSession) {
-      setMfaSatisfied(false);
-      setMfaChecked(true);
-      return;
-    }
-    setMfaChecked(false);
-    try {
-      const { data } =
-        await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-      setMfaSatisfied(data?.currentLevel === "aal2");
-    } catch {
-      setMfaSatisfied(false);
-    } finally {
-      setMfaChecked(true);
-    }
-  }
+  // 2FA has been removed. These remain `true` so any existing route guards
+  // that reference them simply allow access once the user is signed in.
+  const mfaChecked = true;
+  const mfaSatisfied = true;
 
   async function loadUserMeta(uid: string | undefined) {
     if (!uid) {
@@ -103,10 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function refresh() {
     const { data } = await supabase.auth.getSession();
     setSession(data.session);
-    await Promise.all([
-      loadUserMeta(data.session?.user?.id),
-      checkMfa(!!data.session),
-    ]);
+    await loadUserMeta(data.session?.user?.id);
   }
 
   useEffect(() => {
@@ -119,7 +99,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // (roles, balance, blocked status) loads in the background.
       setLoading(false);
       loadUserMeta(data.session?.user?.id);
-      checkMfa(!!data.session);
     });
 
     const {
@@ -130,7 +109,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // defer supabase calls out of the callback
       setTimeout(() => {
         loadUserMeta(newSession?.user?.id);
-        checkMfa(!!newSession);
       }, 0);
     });
 
@@ -150,8 +128,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setBlockReason(null);
     setBalance(0);
     setMetaLoading(false);
-    setMfaSatisfied(false);
-    setMfaChecked(true);
   }
 
   return (
