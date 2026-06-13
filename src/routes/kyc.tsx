@@ -127,7 +127,7 @@ function KycPage() {
 
       <section className="py-16">
         <div className="mx-auto max-w-xl px-6">
-          <h1 className="font-display text-5xl text-foreground">IDENTITY VERIFICATION</h1>
+          <h1 className="font-display text-3xl text-foreground sm:text-4xl md:text-5xl">IDENTITY VERIFICATION</h1>
           <p className="mt-3 text-muted-foreground">
             Upload clear photos of the front and back of your government-issued ID. Withdrawals are locked until an admin approves your verification.
           </p>
