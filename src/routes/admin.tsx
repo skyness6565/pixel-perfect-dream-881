@@ -243,12 +243,12 @@ function AdminPage() {
       <section className="py-12">
         <div className="mx-auto max-w-6xl px-6">
           <div className="flex items-center gap-3">
-            <ShieldCheck className="h-8 w-8 text-primary" />
-            <h1 className="font-display text-4xl text-foreground md:text-5xl">ADMIN DASHBOARD</h1>
+            <ShieldCheck className="h-7 w-7 shrink-0 text-primary sm:h-8 sm:w-8" />
+            <h1 className="font-display text-3xl text-foreground sm:text-4xl md:text-5xl">ADMIN DASHBOARD</h1>
           </div>
 
           {/* Tabs */}
-          <div className="mt-8 flex gap-2 border-b border-border">
+          <div className="mt-8 flex gap-2 overflow-x-auto border-b border-border">
             {([
               { key: "kyc", label: `KYC Submissions (${kyc.length})` },
               { key: "appointments", label: `Appointments (${appointments.length})` },
@@ -257,7 +257,7 @@ function AdminPage() {
               <button
                 key={t.key}
                 onClick={() => setTab(t.key)}
-                className={`px-5 py-3 font-heading text-sm font-semibold uppercase tracking-wide transition-colors ${
+                className={`shrink-0 whitespace-nowrap px-3 py-3 font-heading text-xs font-semibold uppercase tracking-wide transition-colors sm:px-5 sm:text-sm ${
                   tab === t.key
                     ? "border-b-2 border-primary text-foreground"
                     : "text-muted-foreground hover:text-foreground"

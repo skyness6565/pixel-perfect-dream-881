@@ -229,8 +229,8 @@ function WithdrawPage() {
           {/* Main column */}
           <div>
             <div className="flex items-center gap-3">
-              <Banknote className="h-9 w-9 text-primary" />
-              <h1 className="font-display text-5xl text-foreground md:text-6xl">
+              <Banknote className="h-8 w-8 shrink-0 text-primary sm:h-9 sm:w-9" />
+              <h1 className="font-display text-3xl text-foreground sm:text-5xl md:text-6xl">
                 WITHDRAW FUNDS
               </h1>
             </div>

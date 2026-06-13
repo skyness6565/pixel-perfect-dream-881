@@ -109,7 +109,7 @@ function AuthPage() {
 
       <section className="py-16">
         <div className="mx-auto max-w-md px-6">
-          <h1 className="font-display text-5xl text-foreground">{heading}</h1>
+          <h1 className="font-display text-4xl text-foreground sm:text-5xl">{heading}</h1>
 
           <p className="mt-3 text-muted-foreground">
             {mode === "login"

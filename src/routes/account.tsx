@@ -101,7 +101,7 @@ function AccountPage() {
         <div className="mx-auto max-w-4xl px-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h1 className="font-display text-5xl text-foreground">MY ACCOUNT</h1>
+              <h1 className="font-display text-4xl text-foreground sm:text-5xl">MY ACCOUNT</h1>
               <p className="mt-2 text-muted-foreground">{user?.email}</p>
             </div>
             <button
