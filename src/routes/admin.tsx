@@ -243,8 +243,8 @@ function AdminPage() {
       <section className="py-12">
         <div className="mx-auto max-w-6xl px-6">
           <div className="flex items-center gap-3">
-            <ShieldCheck className="h-8 w-8 text-primary" />
-            <h1 className="font-display text-4xl text-foreground md:text-5xl">ADMIN DASHBOARD</h1>
+            <ShieldCheck className="h-7 w-7 shrink-0 text-primary sm:h-8 sm:w-8" />
+            <h1 className="font-display text-3xl text-foreground sm:text-4xl md:text-5xl">ADMIN DASHBOARD</h1>
           </div>
 
           {/* Tabs */}
