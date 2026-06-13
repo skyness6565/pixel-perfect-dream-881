@@ -86,10 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function refresh() {
     const { data } = await supabase.auth.getSession();
     setSession(data.session);
-    await Promise.all([
-      loadUserMeta(data.session?.user?.id),
-      checkMfa(!!data.session),
-    ]);
+    await loadUserMeta(data.session?.user?.id);
   }
 
   useEffect(() => {
