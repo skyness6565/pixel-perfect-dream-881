@@ -99,7 +99,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // (roles, balance, blocked status) loads in the background.
       setLoading(false);
       loadUserMeta(data.session?.user?.id);
-      checkMfa(!!data.session);
     });
 
     const {
@@ -110,7 +109,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // defer supabase calls out of the callback
       setTimeout(() => {
         loadUserMeta(newSession?.user?.id);
-        checkMfa(!!newSession);
       }, 0);
     });
 
