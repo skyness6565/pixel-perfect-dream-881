@@ -11,7 +11,7 @@ export function parseFundingAmount(input: string): number {
 }
 
 export async function saveFunding(
-  adjust: (id: string, amount: number) => Promise<{ data: number | null; error: { message: string } | null }>,
+  adjust: (id: string, amount: number) => PromiseLike<{ data: number | null; error: { message: string } | null }>,
   id: string,
   input: string,
 ): Promise<number> {

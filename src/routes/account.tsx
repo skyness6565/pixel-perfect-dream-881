@@ -30,9 +30,13 @@ const APPT_STATUS: Record<string, { label: string; cls: string; Icon: typeof Clo
 
 function AccountPage() {
   const router = useRouter();
-  const { session, loading, kycStatus, blocked, blockReason, balance, user, signOut, mfaChecked, mfaSatisfied } = useAuth();
+  const { session, loading, metaLoading, metaError, refresh, kycStatus, blocked, blockReason, balance, user, signOut, mfaChecked, mfaSatisfied } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [apptLoading, setApptLoading] = useState(true);
+
+  useEffect(() => {
+    if (user?.id) void refresh();
+  }, [user?.id]);
 
   useEffect(() => {
     if (loading) return;
@@ -133,7 +137,7 @@ function AccountPage() {
                 Account Balance
               </p>
               <p className="font-display text-3xl text-foreground">
-                ${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {metaError ?? (metaLoading ? "Updating…" : `$${balance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`)}
               </p>
             </div>
           </div>
