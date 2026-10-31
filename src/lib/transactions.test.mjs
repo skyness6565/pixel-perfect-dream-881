@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { validateReview } from "./transactions.ts";
+import { validateReview, availableForWithdrawal } from "./transactions.ts";
 
 describe("administrator transaction reviews", () => {
   test("can mark a transaction pending with its reason", () => {
@@ -10,4 +10,12 @@ describe("administrator transaction reviews", () => {
   });
   test("requires a reason for pending", () => { expect(() => validateReview("pending", " ")).toThrow(); });
   test("requires a reason for cancellation", () => { expect(() => validateReview("cancelled", "")).toThrow(); });
+  test("pending requests reserve availability without changing the stored balance", () => {
+    const balance = 100;
+    expect(availableForWithdrawal(balance, [{ amount: 25.35, status: "pending" }])).toBe(74.65);
+    expect(balance).toBe(100);
+  });
+  test("cancelled requests release reserved availability", () => {
+    expect(availableForWithdrawal(100, [{ amount: 25.35, status: "cancelled" }])).toBe(100);
+  });
 });

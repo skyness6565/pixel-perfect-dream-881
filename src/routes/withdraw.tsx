@@ -29,6 +29,7 @@ type Receipt = {
 
 function maskAccount(value: string) {
   const digits = value.replace(/\D/g, "");
+  if (value.startsWith("••••")) return `••••${digits.slice(-4)}`;
   if (digits.length <= 4) return digits;
   return `${"•".repeat(Math.min(digits.length - 4, 8))}${digits.slice(-4)}`;
 }
