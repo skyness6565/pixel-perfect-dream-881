@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { BlockedNotice } from "@/components/blocked-notice";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { MyTransactions } from "@/components/my-transactions";
 
 export const Route = createFileRoute("/account")({
   head: () => ({ meta: [
@@ -170,6 +171,8 @@ function AccountPage() {
               </p>
             </Link>
           </div>
+
+          {user && <MyTransactions userId={user.id} />}
 
           {/* My appointments */}
           <div className="mt-14">

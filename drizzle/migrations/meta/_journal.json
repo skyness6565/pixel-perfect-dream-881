@@ -8,6 +8,13 @@
       "when": 1793404823028,
       "tag": "0000_atomic_admin_funding",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793409303815,
+      "tag": "0001_withdrawal_transaction_review",
+      "breakpoints": true
     }
   ]
 }
