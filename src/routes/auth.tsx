@@ -20,6 +20,12 @@ export const Route = createFileRoute("/auth")({
         content:
           "Sign in or create your account to book appointments, complete verification, and manage withdrawals.",
       },
+      { property: "og:title", content: "Sign In / Create Account — George Strait" },
+      { property: "og:description", content: "Sign in to manage your George Strait account." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:image", content: BANNER },
+      { name: "twitter:image", content: BANNER },
     ],
   }),
   component: AuthPage,

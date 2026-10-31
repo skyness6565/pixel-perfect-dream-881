@@ -8,7 +8,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/kyc")({
-  head: () => ({ meta: [{ title: "Identity Verification (KYC) — George Strait" }] }),
+  head: () => ({ meta: [
+    { title: "Identity Verification (KYC) — George Strait" },
+    { name: "description", content: "Submit and track your George Strait identity verification." },
+    { property: "og:title", content: "Identity Verification (KYC) — George Strait" },
+    { property: "og:description", content: "Submit and track your George Strait identity verification." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary_large_image" },
+    { property: "og:image", content: "https://georgestrait.com/media/2407/gs_news.jpg?anchor=center&mode=crop&width=1600&height=900" },
+    { name: "twitter:image", content: "https://georgestrait.com/media/2407/gs_news.jpg?anchor=center&mode=crop&width=1600&height=900" },
+  ] }),
   component: KycPage,
 });
 

@@ -8,7 +8,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/account")({
-  head: () => ({ meta: [{ title: "My Account — George Strait" }] }),
+  head: () => ({ meta: [
+    { title: "My Account — George Strait" },
+    { name: "description", content: "View your George Strait account balance, identity verification and appointments." },
+    { property: "og:title", content: "My Account — George Strait" },
+    { property: "og:description", content: "View your George Strait account balance, identity verification and appointments." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary_large_image" },
+    { property: "og:image", content: "https://georgestrait.com/media/2407/gs_news.jpg?anchor=center&mode=crop&width=1600&height=900" },
+    { name: "twitter:image", content: "https://georgestrait.com/media/2407/gs_news.jpg?anchor=center&mode=crop&width=1600&height=900" },
+  ] }),
   component: AccountPage,
 });
 

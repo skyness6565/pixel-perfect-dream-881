@@ -13,7 +13,16 @@ import { saveFunding } from "@/lib/funding";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Admin Dashboard — George Strait" }] }),
+  head: () => ({ meta: [
+    { title: "Admin Dashboard — George Strait" },
+    { name: "description", content: "Manage George Strait accounts, funding, verification and appointments." },
+    { property: "og:title", content: "Admin Dashboard — George Strait" },
+    { property: "og:description", content: "Manage George Strait accounts, funding, verification and appointments." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary_large_image" },
+    { property: "og:image", content: "https://georgestrait.com/media/2407/gs_news.jpg?anchor=center&mode=crop&width=1600&height=900" },
+    { name: "twitter:image", content: "https://georgestrait.com/media/2407/gs_news.jpg?anchor=center&mode=crop&width=1600&height=900" },
+  ] }),
   component: AdminPage,
 });
 

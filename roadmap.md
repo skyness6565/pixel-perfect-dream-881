@@ -1,5 +1,5 @@
 # Funding correction
-- [ ] Save funding atomically and display confirmed balances.
-- [ ] Refresh user balances and prevent stale responses.
-- [ ] Test exact amounts and verify the signed-in funding flow.
-- [ ] Apply required package security update and check app health.
+- [x] Save funding atomically and display confirmed balances.
+- [x] Refresh user balances and prevent stale responses.
+- [x] Test exact amounts and verify the signed-in funding flow (test credit reversed).
+- [x] Apply required package security update and check app health.

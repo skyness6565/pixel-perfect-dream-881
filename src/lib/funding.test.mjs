@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { parseFundingAmount, saveFunding } from "./funding";
+import { parseFundingAmount, saveFunding } from "./funding.ts";
 
 describe("exact account funding", () => {
   test("accepts the exact dollars and cents entered, including grouped amounts", () => {
