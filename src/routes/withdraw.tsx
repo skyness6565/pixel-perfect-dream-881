@@ -5,6 +5,9 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { BlockedNotice } from "@/components/blocked-notice";
 import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { availableForWithdrawal, type WithdrawalTransaction } from "@/lib/transactions";
 
 const MEDIA = "https://georgestrait.com/media";
 const BANNER = `${MEDIA}/2407/gs_news.jpg?anchor=center&mode=crop&width=1600&height=900`;
@@ -29,13 +32,6 @@ function maskAccount(value: string) {
   if (digits.length <= 4) return digits;
   return `${"•".repeat(Math.min(digits.length - 4, 8))}${digits.slice(-4)}`;
 }
-
-function genReference() {
-  const rand = Math.random().toString(36).slice(2, 8).toUpperCase();
-  const stamp = Date.now().toString().slice(-6);
-  return `GS-${stamp}-${rand}`;
-}
-
 
 
 export const Route = createFileRoute("/withdraw")({
@@ -115,6 +111,27 @@ function WithdrawPage() {
   const [submitted, setSubmitted] = useState(false);
   const [amount, setAmount] = useState("");
   const [receipt, setReceipt] = useState<Receipt | null>(null);
+  const [requests, setRequests] = useState<WithdrawalTransaction[]>([]);
+  const [requestsLoading, setRequestsLoading] = useState(true);
+  const [requestsError, setRequestsError] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const availableBalance = availableForWithdrawal(balance, requests);
+
+  useEffect(() => {
+    if (!session?.user.id) return;
+    let active = true;
+    const load = async () => {
+      const { data, error } = await supabase.from("withdrawal_transactions").select("*").eq("user_id", session.user.id).order("created_at", { ascending: false });
+      if (!active) return;
+      setRequestsError(!!error);
+      if (!error) setRequests(data ?? []);
+      setRequestsLoading(false);
+    };
+    void load();
+    const interval = window.setInterval(() => { if (document.visibilityState === "visible") void load(); }, 15000);
+    return () => { active = false; window.clearInterval(interval); };
+  }, [session?.user.id]);
 
   useEffect(() => {
     if (loading) return;
@@ -123,26 +140,29 @@ function WithdrawPage() {
     }
   }, [loading, session, mfaChecked, mfaSatisfied, router]);
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (saving || !session) return;
     const form = e.currentTarget;
     const data = new FormData(form);
     const get = (name: string) => String(data.get(name) ?? "").trim();
-    setReceipt({
-      reference: genReference(),
-      date: new Date(),
-      amount: get("amount") || amount,
-      accountHolder: get("accountHolder"),
-      bankName: get("bankName"),
-      accountType: get("accountType"),
-      accountNumber: get("accountNumber"),
-      routingNumber: get("routingNumber"),
-      email: get("email"),
-    });
-    setSubmitted(true);
-    if (typeof window !== "undefined") {
+    setSaving(true);
+    setSubmitError(null);
+    try {
+      const { data: saved, error } = await supabase.rpc("request_withdrawal", {
+        _amount: Number(get("amount")), _account_holder: get("accountHolder"), _bank_name: get("bankName"),
+        _account_type: get("accountType"), _account_number: get("accountNumber"), _routing_number: get("routingNumber"), _email: get("email"),
+      });
+      if (error) throw new Error(error.message);
+      if (!saved) throw new Error("Could not confirm your withdrawal request");
+      setRequests(prev => [saved, ...prev]);
+      setReceipt({ reference: saved.reference, date: new Date(saved.created_at), amount: String(saved.amount), accountHolder: saved.account_holder,
+        bankName: saved.bank_name, accountType: saved.account_type, accountNumber: `••••${saved.account_last4}`, routingNumber: `••••${saved.routing_last4}`, email: saved.email });
+      form.reset();
+      setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+    } catch (error) { setSubmitError(error instanceof Error ? error.message : "Could not save withdrawal request"); }
+    finally { setSaving(false); }
   }
 
   function resetForm() {
@@ -247,7 +267,7 @@ function WithdrawPage() {
                   Available Balance
                 </p>
                 <p className="mt-1 font-display text-4xl text-foreground">
-                  {metaError ?? (metaLoading ? "Updating…" : `$${balance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`)}
+                  {metaError ?? (requestsError ? "Balance unavailable" : metaLoading || requestsLoading ? "Updating…" : `$${availableBalance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`)}
                 </p>
               </div>
               <span className="font-heading text-sm font-semibold uppercase tracking-wide text-muted-foreground">
@@ -277,7 +297,7 @@ function WithdrawPage() {
                       name="amount"
                       type="number"
                       min="1"
-                      max={balance}
+                      max={availableBalance}
                       step="0.01"
                       required
                       value={amount}
@@ -493,16 +513,17 @@ function WithdrawPage() {
 
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <ShieldCheck className="h-4 w-4 text-primary" />
-                  Your banking information is encrypted and processed securely.
+                  Only the last four digits are saved with your review request.
                 </div>
 
-                <button
+                {submitError && <p role="alert" className="text-sm text-destructive">{submitError}</p>}
+                <Button
                   type="submit"
-                  disabled={metaLoading || !!metaError || balance < 1}
+                  disabled={saving || requestsLoading || requestsError || metaLoading || !!metaError || availableBalance < 1}
                   className="inline-flex items-center bg-foreground px-8 py-3 font-heading text-sm font-semibold uppercase tracking-widest text-background transition-colors hover:bg-primary"
                 >
-                  Withdraw Funds
-                </button>
+                  {saving ? "Saving request…" : "Withdraw Funds"}
+                </Button>
               </form>
             )}
           </div>
@@ -597,8 +618,7 @@ function WithdrawalReceipt({ receipt, onReset }: { receipt: Receipt; onReset: ()
       <div className="mb-6 flex items-center gap-3 border border-primary/30 bg-primary/5 px-5 py-4">
         <CheckCircle2 className="h-6 w-6 shrink-0 text-primary" />
         <p className="text-sm text-foreground">
-          <span className="font-semibold">Withdrawal requested.</span> Funds
-          typically arrive in your US bank account within 1–3 business days.
+          <span className="font-semibold">Withdrawal request saved.</span> Pending administrator review. This is not confirmation of a bank payout.
         </p>
       </div>
 
@@ -643,13 +663,13 @@ function WithdrawalReceipt({ receipt, onReset }: { receipt: Receipt; onReset: ()
           {/* Amount hero */}
           <div className="border-b border-border px-6 py-7 text-center">
             <p className="font-heading text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              Amount Withdrawn
+              Amount Requested
             </p>
             <p className="mt-2 font-display text-5xl text-foreground">
               ${formattedAmount}
             </p>
             <p className="mt-1 font-heading text-xs font-semibold uppercase tracking-widest text-primary">
-              USD · Processing
+              USD · Pending review
             </p>
           </div>
 
@@ -671,6 +691,8 @@ function WithdrawalReceipt({ receipt, onReset }: { receipt: Receipt; onReset: ()
               mono
             />
             <ReceiptRow label="Email" value={receipt.email} />
+            <ReceiptRow label="Status" value="Pending" />
+            <ReceiptRow label="Reason" value="Awaiting administrator review." />
           </div>
 
           {/* Footer */}
@@ -678,7 +700,7 @@ function WithdrawalReceipt({ receipt, onReset }: { receipt: Receipt; onReset: ()
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <ShieldCheck className="h-4 w-4 shrink-0 text-primary" />
               This receipt confirms your withdrawal request was received and is
-              being processed securely.
+              awaiting review. Current status and reasons are available in My Account.
             </div>
             <p className="mt-3 text-center font-heading text-[10px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
               Thank you · George Strait Official
