@@ -3,3 +3,8 @@
 - [x] Refresh user balances and prevent stale responses.
 - [x] Test exact amounts and verify the signed-in funding flow (test credit reversed).
 - [x] Apply required package security update and check app health.
+
+# Transaction review
+- [ ] Save withdrawal requests and expose them to authorized administrators.
+- [ ] Add pending/cancelled controls with required reasons and user-visible status history.
+- [ ] Verify submission, review, persistence and permission rules.
