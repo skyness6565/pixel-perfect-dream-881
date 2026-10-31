@@ -11,6 +11,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { saveFunding } from "@/lib/funding";
 import { Button } from "@/components/ui/button";
+import { TransactionList } from "@/components/transaction-list";
+import type { WithdrawalTransaction, TransactionReview, TransactionStatus } from "@/lib/transactions";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [
@@ -52,7 +54,10 @@ type Appointment = {
 function AdminPage() {
   const router = useRouter();
   const { session, loading, metaLoading, isAdmin, user, refresh, mfaChecked, mfaSatisfied } = useAuth();
-  const [tab, setTab] = useState<"kyc" | "appointments" | "users">("kyc");
+  const [tab, setTab] = useState<"kyc" | "appointments" | "users" | "transactions">("kyc");
+  const [transactions, setTransactions] = useState<WithdrawalTransaction[]>([]);
+  const [reviews, setReviews] = useState<TransactionReview[]>([]);
+  const [transactionError, setTransactionError] = useState(false);
   const [kyc, setKyc] = useState<Kyc[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [profiles, setProfiles] = useState<Record<string, Profile>>({});
@@ -77,6 +82,33 @@ function AdminPage() {
     setUsers(list);
     setDataLoading(false);
   }, []);
+
+  const loadTransactions = useCallback(async () => {
+    const [t, r] = await Promise.all([
+      supabase.from("withdrawal_transactions").select("*").order("created_at", { ascending: false }),
+      supabase.from("withdrawal_transaction_reviews").select("*").order("created_at", { ascending: false }),
+    ]);
+    setTransactionError(!!(t.error || r.error));
+    if (!t.error && !r.error) { setTransactions(t.data ?? []); setReviews(r.data ?? []); }
+  }, []);
+
+  useEffect(() => {
+    if (!isAdmin || !session) return;
+    void loadTransactions();
+    const reload = () => { if (document.visibilityState === "visible") void loadTransactions(); };
+    const interval = window.setInterval(reload, 15000);
+    window.addEventListener("focus", reload);
+    return () => { window.clearInterval(interval); window.removeEventListener("focus", reload); };
+  }, [isAdmin, session, loadTransactions]);
+
+  async function reviewTransaction(id: string, status: TransactionStatus, reason: string) {
+    const { data, error } = await supabase.rpc("admin_review_withdrawal", { _id: id, _status: status, _reason: reason });
+    if (error) throw new Error(error.message);
+    if (!data) throw new Error("Could not confirm saved transaction");
+    setTransactions(prev => prev.map(t => t.id === id ? data : t));
+    toast.success(`Transaction ${status}`);
+    await loadTransactions();
+  }
 
 
   useEffect(() => {
@@ -263,8 +295,9 @@ function AdminPage() {
               { key: "kyc", label: `KYC Submissions (${kyc.length})` },
               { key: "appointments", label: `Appointments (${appointments.length})` },
               { key: "users", label: `Users (${users.length})` },
+              { key: "transactions", label: `Transactions (${transactions.length})` },
             ] as const).map((t) => (
-              <button
+              <Button variant="ghost"
                 key={t.key}
                 onClick={() => setTab(t.key)}
                 className={`shrink-0 whitespace-nowrap px-3 py-3 font-heading text-xs font-semibold uppercase tracking-wide transition-colors sm:px-5 sm:text-sm ${
@@ -274,13 +307,18 @@ function AdminPage() {
                 }`}
               >
                 {t.label}
-              </button>
+              </Button>
             ))}
           </div>
 
           {dataLoading ? (
             <div className="flex h-40 items-center justify-center text-muted-foreground">
               <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Loading…
+            </div>
+          ) : tab === "transactions" ? (
+            <div className="mt-8">
+              <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="font-display text-3xl">WITHDRAWAL TRANSACTIONS</h2><Button variant="outline" onClick={() => void loadTransactions()}>Refresh</Button></div>
+              {transactionError ? <p role="alert" className="mt-6 text-destructive">Could not load transactions. Please refresh.</p> : <TransactionList transactions={transactions} reviews={reviews} userLabel={userLabel} onReview={reviewTransaction} />}
             </div>
           ) : tab === "kyc" ? (
             <div className="mt-8 space-y-4">
