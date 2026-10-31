@@ -143,6 +143,95 @@ export type Database = {
         }
         Relationships: []
       }
+      withdrawal_transaction_reviews: {
+        Row: {
+          created_at: string
+          id: string
+          reason: string
+          reviewed_by: string
+          status: string
+          transaction_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reason: string
+          reviewed_by: string
+          status: string
+          transaction_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reason?: string
+          reviewed_by?: string
+          status?: string
+          transaction_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "withdrawal_transaction_reviews_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "withdrawal_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      withdrawal_transactions: {
+        Row: {
+          account_holder: string
+          account_last4: string
+          account_type: string
+          amount: number
+          bank_name: string
+          created_at: string
+          email: string
+          id: string
+          reference: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          routing_last4: string
+          status: string
+          status_reason: string
+          user_id: string
+        }
+        Insert: {
+          account_holder: string
+          account_last4: string
+          account_type: string
+          amount: number
+          bank_name: string
+          created_at?: string
+          email: string
+          id?: string
+          reference?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          routing_last4: string
+          status?: string
+          status_reason?: string
+          user_id: string
+        }
+        Update: {
+          account_holder?: string
+          account_last4?: string
+          account_type?: string
+          amount?: number
+          bank_name?: string
+          created_at?: string
+          email?: string
+          id?: string
+          reference?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          routing_last4?: string
+          status?: string
+          status_reason?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -152,6 +241,32 @@ export type Database = {
         Args: { _amount: number; _user_id: string }
         Returns: number
       }
+      admin_review_withdrawal: {
+        Args: { _id: string; _reason: string; _status: string }
+        Returns: {
+          account_holder: string
+          account_last4: string
+          account_type: string
+          amount: number
+          bank_name: string
+          created_at: string
+          email: string
+          id: string
+          reference: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          routing_last4: string
+          status: string
+          status_reason: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "withdrawal_transactions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -160,6 +275,40 @@ export type Database = {
         Returns: boolean
       }
       is_kyc_approved: { Args: { _user_id: string }; Returns: boolean }
+      request_withdrawal: {
+        Args: {
+          _account_holder: string
+          _account_number: string
+          _account_type: string
+          _amount: number
+          _bank_name: string
+          _email: string
+          _routing_number: string
+        }
+        Returns: {
+          account_holder: string
+          account_last4: string
+          account_type: string
+          amount: number
+          bank_name: string
+          created_at: string
+          email: string
+          id: string
+          reference: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          routing_last4: string
+          status: string
+          status_reason: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "withdrawal_transactions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       app_role: "admin" | "user"
