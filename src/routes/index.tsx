@@ -20,6 +20,7 @@ export const Route = createFileRoute("/")({
           "News, tour dates, music and more from country legend George Strait.",
       },
       { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Index,

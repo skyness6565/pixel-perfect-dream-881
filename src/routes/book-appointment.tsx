@@ -20,6 +20,12 @@ export const Route = createFileRoute("/book-appointment")({
         content:
           "Schedule an appointment with the George Strait team. Pick your date, time, and share your details.",
       },
+      { property: "og:title", content: "Book an Appointment — George Strait" },
+      { property: "og:description", content: "Schedule and manage your George Strait appointments." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:image", content: BANNER },
+      { name: "twitter:image", content: BANNER },
     ],
   }),
   component: BookAppointmentPage,

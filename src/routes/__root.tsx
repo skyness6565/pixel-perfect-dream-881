@@ -89,8 +89,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "George Strait — Official" },
       { name: "twitter:description", content: "Book appointments, join the fan club, and manage your account with the official George Strait experience." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/41e44524-56d0-44aa-805c-d6c0e0077f9c/id-preview-bde2fdce--ba309e4b-d2b7-41e8-972c-3682bb613f81.lovable.app-1780325517288.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/41e44524-56d0-44aa-805c-d6c0e0077f9c/id-preview-bde2fdce--ba309e4b-d2b7-41e8-972c-3682bb613f81.lovable.app-1780325517288.png" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
