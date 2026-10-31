@@ -106,11 +106,10 @@ const LATEST_NEWS = [
   },
 ];
 
-const AVAILABLE_BALANCE = 1250.0;
 
 function WithdrawPage() {
   const router = useRouter();
-  const { session, loading, kycStatus, blocked, blockReason, mfaChecked, mfaSatisfied } = useAuth();
+  const { session, loading, metaLoading, metaError, balance, kycStatus, blocked, blockReason, mfaChecked, mfaSatisfied } = useAuth();
   const [submitted, setSubmitted] = useState(false);
   const [amount, setAmount] = useState("");
   const [receipt, setReceipt] = useState<Receipt | null>(null);
@@ -246,7 +245,7 @@ function WithdrawPage() {
                   Available Balance
                 </p>
                 <p className="mt-1 font-display text-4xl text-foreground">
-                  ${AVAILABLE_BALANCE.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                  {metaError ?? (metaLoading ? "Updating…" : `$${balance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`)}
                 </p>
               </div>
               <span className="font-heading text-sm font-semibold uppercase tracking-wide text-muted-foreground">
@@ -276,7 +275,7 @@ function WithdrawPage() {
                       name="amount"
                       type="number"
                       min="1"
-                      max={AVAILABLE_BALANCE}
+                      max={balance}
                       step="0.01"
                       required
                       value={amount}
@@ -497,6 +496,7 @@ function WithdrawPage() {
 
                 <button
                   type="submit"
+                  disabled={metaLoading || !!metaError || balance < 1}
                   className="inline-flex items-center bg-foreground px-8 py-3 font-heading text-sm font-semibold uppercase tracking-widest text-background transition-colors hover:bg-primary"
                 >
                   Withdraw Funds

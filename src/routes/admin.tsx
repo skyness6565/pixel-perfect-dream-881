@@ -9,6 +9,8 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { saveFunding } from "@/lib/funding";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin Dashboard — George Strait" }] }),
@@ -40,7 +42,7 @@ type Appointment = {
 
 function AdminPage() {
   const router = useRouter();
-  const { session, loading, metaLoading, isAdmin, user, mfaChecked, mfaSatisfied } = useAuth();
+  const { session, loading, metaLoading, isAdmin, user, refresh, mfaChecked, mfaSatisfied } = useAuth();
   const [tab, setTab] = useState<"kyc" | "appointments" | "users">("kyc");
   const [kyc, setKyc] = useState<Kyc[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -100,10 +102,11 @@ function AdminPage() {
   }
 
   async function reviewKyc(id: string, status: "approved" | "rejected") {
+    if (!user) return;
     setBusyId(id);
     const { error } = await supabase
       .from("kyc_submissions")
-      .update({ status, reviewed_by: user!.id, reviewed_at: new Date().toISOString() })
+      .update({ status, reviewed_by: user.id, reviewed_at: new Date().toISOString() })
       .eq("id", id);
     if (error) {
       toast.error(error.message);
@@ -135,24 +138,22 @@ function AdminPage() {
       "100",
     );
     if (input === null) return;
-    const amount = Number(input);
-    if (!Number.isFinite(amount) || amount === 0) {
-      toast.error("Enter a valid non-zero amount");
-      return;
-    }
-    const newBalance = Math.max(0, Number(u.balance) + amount);
     setBusyId(u.id);
-    const { error } = await supabase
-      .from("profiles")
-      .update({ balance: newBalance })
-      .eq("id", u.id);
-    if (error) {
-      toast.error(error.message);
-    } else {
+    try {
+      const newBalance = await saveFunding(
+        (id, amount) => supabase.rpc("admin_adjust_balance", { _user_id: id, _amount: amount }),
+        u.id,
+        input,
+      );
       toast.success(`Balance updated to $${newBalance.toFixed(2)}`);
       setUsers((prev) => prev.map((p) => (p.id === u.id ? { ...p, balance: newBalance } : p)));
+      setProfiles((prev) => ({ ...prev, [u.id]: { ...u, balance: newBalance } }));
+      if (u.id === user?.id) await refresh();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not fund this account");
+    } finally {
+      setBusyId(null);
     }
-    setBusyId(null);
   }
 
   async function toggleBlock(u: Profile) {
@@ -374,13 +375,13 @@ function AdminPage() {
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <button
-                      disabled={busyId === u.id}
+                    <Button
+                      disabled={busyId !== null}
                       onClick={() => fundUser(u)}
-                      className="inline-flex items-center gap-1.5 bg-green-600 px-3 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-60"
+                      className="px-3 py-2 text-sm font-semibold"
                     >
                       {busyId === u.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wallet className="h-4 w-4" />} Fund
-                    </button>
+                    </Button>
                     <button
                       disabled={busyId === u.id}
                       onClick={() => toggleBlock(u)}

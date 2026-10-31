@@ -3,6 +3,7 @@ import {
   useContext,
   useEffect,
   useState,
+  useRef,
   type ReactNode,
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
@@ -17,6 +18,7 @@ type AuthContextValue = {
   blocked: boolean;
   blockReason: string | null;
   balance: number;
+  metaError: string | null;
   kycStatus: "none" | "pending" | "approved" | "rejected";
   // 2FA gate: mfaChecked = we've inspected the session's assurance level;
   // mfaSatisfied = the current session has completed 2FA (aal2).
@@ -36,6 +38,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [blocked, setBlocked] = useState(false);
   const [blockReason, setBlockReason] = useState<string | null>(null);
   const [balance, setBalance] = useState(0);
+  const [metaError, setMetaError] = useState<string | null>(null);
+  const metaRequest = useRef(0);
   const [kycStatus, setKycStatus] =
     useState<AuthContextValue["kycStatus"]>("none");
   // 2FA has been removed. These remain `true` so any existing route guards
@@ -44,18 +48,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const mfaSatisfied = true;
 
   async function loadUserMeta(uid: string | undefined) {
+    const request = ++metaRequest.current;
     if (!uid) {
       setIsAdmin(false);
       setKycStatus("none");
       setBlocked(false);
       setBlockReason(null);
       setBalance(0);
+      setMetaError(null);
       setMetaLoading(false);
       return;
     }
     setMetaLoading(true);
     try {
-      const [{ data: roles }, { data: kyc }, { data: profile }] = await Promise.all([
+      const [rolesResult, kycResult, profileResult] = await Promise.all([
         supabase.from("user_roles").select("role").eq("user_id", uid),
         supabase
           .from("kyc_submissions")
@@ -69,6 +75,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .eq("id", uid)
           .maybeSingle(),
       ]);
+      if (request !== metaRequest.current) return;
+      const error = rolesResult.error ?? kycResult.error ?? profileResult.error;
+      if (error || !profileResult.data) throw new Error("Could not load your account details");
+      const roles = rolesResult.data;
+      const kyc = kycResult.data;
+      const profile = profileResult.data;
+      setMetaError(null);
       setIsAdmin(!!roles?.some((r) => r.role === "admin"));
       setBlocked(!!profile?.blocked);
       setBlockReason((profile?.block_reason as string | null) ?? null);
@@ -78,8 +91,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setKycStatus("none");
       }
+    } catch {
+      if (request === metaRequest.current) setMetaError("Balance unavailable");
     } finally {
-      setMetaLoading(false);
+      if (request === metaRequest.current) setMetaLoading(false);
     }
   }
 
@@ -103,9 +118,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    } = supabase.auth.onAuthStateChange((event, newSession) => {
       setSession(newSession);
       setLoading(false);
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       // defer supabase calls out of the callback
       setTimeout(() => {
         loadUserMeta(newSession?.user?.id);
@@ -114,13 +130,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => {
       mounted = false;
+      metaRequest.current++;
       subscription.unsubscribe();
     };
   }, []);
 
+  const uid = session?.user.id;
+  useEffect(() => {
+    if (!uid) return;
+    const reload = () => {
+      if (document.visibilityState === "visible") void loadUserMeta(uid);
+    };
+    reload();
+    const interval = window.setInterval(reload, 15000);
+    window.addEventListener("focus", reload);
+    window.addEventListener("popstate", reload);
+    document.addEventListener("visibilitychange", reload);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("focus", reload);
+      window.removeEventListener("popstate", reload);
+      document.removeEventListener("visibilitychange", reload);
+    };
+  }, [uid]);
+
 
   async function signOut() {
     await supabase.auth.signOut();
+    metaRequest.current++;
     setSession(null);
     setIsAdmin(false);
     setKycStatus("none");
@@ -141,6 +178,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         blocked,
         blockReason,
         balance,
+        metaError,
         kycStatus,
         mfaChecked,
         mfaSatisfied,
