@@ -7,4 +7,4 @@
 # Transaction review
 - [x] Save withdrawal requests and expose them to authorized administrators.
 - [x] Add pending/cancelled controls with required reasons and user-visible status history.
-- [ ] Verify submission, review, persistence and permission rules.
+- [x] Verify submission, review, persistence and permission rules (verification request cancelled; no payout or balance change).
