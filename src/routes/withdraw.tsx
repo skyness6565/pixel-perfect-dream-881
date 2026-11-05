@@ -277,7 +277,7 @@ function WithdrawPage() {
             </div>
 
             {submitted && receipt ? (
-              <WithdrawalReceipt receipt={receipt} onReset={resetForm} />
+              <WithdrawalReceipt receipt={receipt} transaction={requests.find(t => t.reference === receipt.reference)} onReset={resetForm} />
             ) : (
               <form onSubmit={handleSubmit} className="mt-10 max-w-xl space-y-6">
                 {/* Amount */}
@@ -599,7 +599,10 @@ function ReceiptRow({ label, value, mono }: { label: string; value: string; mono
   );
 }
 
-function WithdrawalReceipt({ receipt, onReset }: { receipt: Receipt; onReset: () => void }) {
+function WithdrawalReceipt({ receipt, transaction, onReset }: { receipt: Receipt; transaction?: WithdrawalTransaction; onReset: () => void }) {
+  const status = transaction?.status ?? "pending";
+  const statusLabel = status === "confirmed" ? "Confirmed" : status === "cancelled" ? "Cancelled" : "Pending";
+  const reason = transaction?.status_reason ?? "Awaiting administrator review.";
   const amountNum = Number(receipt.amount) || 0;
   const formattedAmount = amountNum.toLocaleString("en-US", {
     minimumFractionDigits: 2,
@@ -619,7 +622,7 @@ function WithdrawalReceipt({ receipt, onReset }: { receipt: Receipt; onReset: ()
       <div className="mb-6 flex items-center gap-3 border border-primary/30 bg-primary/5 px-5 py-4">
         <CheckCircle2 className="h-6 w-6 shrink-0 text-primary" />
         <p className="text-sm text-foreground">
-          <span className="font-semibold">Withdrawal request saved.</span> Pending administrator review. This is not confirmation of a bank payout.
+          <span className="font-semibold">Withdrawal request {statusLabel.toLowerCase()}.</span> This is not confirmation of a bank payout.
         </p>
       </div>
 
@@ -670,7 +673,7 @@ function WithdrawalReceipt({ receipt, onReset }: { receipt: Receipt; onReset: ()
               ${formattedAmount}
             </p>
             <p className="mt-1 font-heading text-xs font-semibold uppercase tracking-widest text-primary">
-              USD · Pending review
+              USD · {statusLabel}
             </p>
           </div>
 
@@ -692,16 +695,16 @@ function WithdrawalReceipt({ receipt, onReset }: { receipt: Receipt; onReset: ()
               mono
             />
             <ReceiptRow label="Email" value={receipt.email} />
-            <ReceiptRow label="Status" value="Pending" />
-            <ReceiptRow label="Reason" value="Awaiting administrator review." />
+            <ReceiptRow label="Status" value={statusLabel} />
+            <ReceiptRow label="Reason" value={reason} />
           </div>
 
           {/* Footer */}
           <div className="border-t border-border bg-secondary px-6 py-5">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <ShieldCheck className="h-4 w-4 shrink-0 text-primary" />
-              This receipt confirms your withdrawal request was received and is
-              awaiting review. Current status and reasons are available in My Account.
+              This receipt records your withdrawal request, not a bank payout.
+              Current status and reasons are also available in My Account.
             </div>
             <p className="mt-3 text-center font-heading text-[10px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
               Thank you · George Strait Official
